@@ -11,7 +11,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { useThemeContext } from "../../app/providers/ThemeProvider";
