@@ -4,7 +4,7 @@ import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory 
 import { useLanguage } from "../../../hooks/ui/useLanguage";
 import type { Category } from "../../../types/api.types";
 
-const EMPTY = { name_ar: "", name_en: "" };
+const EMPTY = { name_ar: "", name_en: "", image_url: "" };
 
 const CategoriesManager = () => {
   const { language } = useLanguage();
@@ -33,7 +33,7 @@ const CategoriesManager = () => {
   };
 
   const startEdit = (cat: Category) => {
-    setForm({ name_ar: cat.name_ar, name_en: cat.name_en });
+    setForm({ name_ar: cat.name_ar, name_en: cat.name_en, image_url: cat.image_url ?? "" });
     setEditItem(cat);
     setShowAdd(true);
   };
@@ -42,14 +42,14 @@ const CategoriesManager = () => {
     <div className="max-w-3xl mx-auto space-y-5">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-(--foreground)">{ar ? "إدارة التصنيفات" : "Categories Manager"}</h1>
           <p className="text-sm text-(--muted-foreground) mt-0.5">{ar ? `${cats.length} تصنيف` : `${cats.length} categories`}</p>
         </div>
         <button
           onClick={() => { setForm(EMPTY); setEditItem(null); setShowAdd(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -65,7 +65,7 @@ const CategoriesManager = () => {
             {editItem ? (ar ? "تعديل التصنيف" : "Edit Category") : (ar ? "تصنيف جديد" : "New Category")}
           </h2>
           <form onSubmit={handleSave} className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-(--foreground)">{ar ? "الاسم بالعربي" : "Name (Arabic)"} *</label>
                 <input
@@ -88,6 +88,25 @@ const CategoriesManager = () => {
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-(--foreground)">{ar ? "رابط الصورة" : "Image URL"}</label>
+              <input
+                value={form.image_url}
+                onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))}
+                type="url"
+                title={ar ? "رابط الصورة" : "Image URL"}
+                placeholder="https://..."
+                className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+              />
+              {form.image_url && (
+                <img
+                  src={form.image_url}
+                  alt="preview"
+                  className="mt-2 h-24 w-full object-cover rounded-xl border border-(--border)"
+                  onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              )}
             </div>
             <div className="flex gap-2 justify-end">
               <button type="button" onClick={resetForm} className="px-4 py-2 rounded-xl text-sm text-(--muted-foreground) hover:bg-(--muted) transition-colors">
@@ -114,25 +133,34 @@ const CategoriesManager = () => {
         ) : (
           <div className="divide-y divide-(--border)">
             {cats.map(cat => (
-              <div key={cat.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-(--muted)/30 transition-colors group">
-                {/* Icon */}
-                <div className="w-8 h-8 rounded-lg bg-(--primary)/10 flex items-center justify-center shrink-0">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-(--primary)">
-                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-                    <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
-                    <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-                  </svg>
+              <div key={cat.id} className="flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-3.5 hover:bg-(--muted)/30 transition-colors group">
+                {/* Image / Icon */}
+                {cat.image_url ? (
+                  <img
+                    src={cat.image_url}
+                    alt={cat.name_ar}
+                    className="w-8 h-8 rounded-lg object-cover border border-(--border) shrink-0"
+                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-(--primary)/10 flex items-center justify-center shrink-0">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-(--primary)">
+                      <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                      <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+                      <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                  </div>
+                )}
+
+                {/* Names: stacked on mobile, side by side on larger screens */}
+                <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-3">
+                  <span className="font-medium text-(--foreground) truncate">{cat.name_ar}</span>
+                  <span className="hidden sm:inline text-(--muted-foreground) text-sm">·</span>
+                  <span className="text-xs sm:text-sm text-(--muted-foreground) truncate">{cat.name_en}</span>
                 </div>
 
-                {/* Names */}
-                <div className="flex-1 min-w-0 flex items-center gap-3">
-                  <span className="font-medium text-(--foreground)">{cat.name_ar}</span>
-                  <span className="text-(--muted-foreground) text-sm">·</span>
-                  <span className="text-sm text-(--muted-foreground)">{cat.name_en}</span>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Actions: always visible on mobile, hover-reveal on desktop */}
+                <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => startEdit(cat)}
                     aria-label={ar ? "تعديل" : "Edit"}

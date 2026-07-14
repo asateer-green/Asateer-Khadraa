@@ -83,7 +83,7 @@ function PortfolioModal({
           <div className="p-6 space-y-4">
 
             {/* Titles */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-(--foreground)">{ar ? "العنوان بالعربي" : "Title (Arabic)"} *</label>
                 <input
@@ -264,7 +264,7 @@ const PortfolioManager = () => {
     <div className="max-w-5xl mx-auto space-y-5">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-(--foreground)">{ar ? "إدارة الأعمال" : "Portfolio Manager"}</h1>
           <p className="text-sm text-(--muted-foreground) mt-0.5">
@@ -273,7 +273,7 @@ const PortfolioManager = () => {
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -350,8 +350,8 @@ const PortfolioManager = () => {
                 </div>
               )}
 
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3 z-20">
+              {/* Overlay: always visible on mobile, hover-reveal on desktop */}
+              <div className="absolute inset-0 bg-black/40 sm:bg-black/60 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2 sm:p-3 z-20">
                 <div className="flex justify-end gap-1">
                   <button
                     onClick={(e) => {
@@ -359,7 +359,7 @@ const PortfolioManager = () => {
                       setEditItem(item);
                     }}
                     aria-label={ar ? "تعديل" : "Edit"}
-                    className="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
@@ -372,14 +372,14 @@ const PortfolioManager = () => {
                       setDeleteTarget(item);
                     }}
                     aria-label={ar ? "حذف" : "Delete"}
-                    className="w-8 h-8 rounded-lg bg-red-500/80 hover:bg-red-500 flex items-center justify-center text-white transition-colors"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-500/80 hover:bg-red-500 flex items-center justify-center text-white transition-colors"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
                     </svg>
                   </button>
                 </div>
-                <p className="text-white text-sm font-medium truncate">
+                <p className="text-white text-xs sm:text-sm font-medium truncate">
                   {ar ? item.title_ar : item.title_en}
                 </p>
               </div>

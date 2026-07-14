@@ -173,7 +173,7 @@ const QuotesManager = () => {
         <div className="relative flex-1">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-            className="absolute inset-y-0 start-3 my-auto text-(--muted-foreground)">
+            className="absolute inset-y-0 inset-s-3 my-auto text-(--muted-foreground)">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input
@@ -187,7 +187,7 @@ const QuotesManager = () => {
       </div>
 
       {/* Status tabs */}
-      <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
+      <div className="flex flex-wrap gap-1 p-1 bg-(--muted)/50 rounded-xl w-full sm:w-fit">
         {STATUS_TABS.map(tab => {
           const count = tab.key === "all"
             ? quotes.length
@@ -197,7 +197,7 @@ const QuotesManager = () => {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`
-                px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
+                px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap
                 ${activeTab === tab.key
                   ? "bg-(--card) text-(--foreground) shadow-sm"
                   : "text-(--muted-foreground) hover:text-(--foreground)"
@@ -232,56 +232,82 @@ const QuotesManager = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-(--border)">
-                  {[
-                    ar ? "الاسم"    : "Name",
-                    ar ? "الخدمة"   : "Service",
-                    ar ? "الهاتف"   : "Phone",
-                    ar ? "التاريخ"  : "Date",
-                    ar ? "الحالة"   : "Status",
-                    ar ? "إجراء"    : "Action",
-                  ].map(h => (
-                    <th key={h} className="text-start px-5 py-3 text-xs font-medium text-(--muted-foreground) whitespace-nowrap">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-(--border)">
-                {filtered.map(q => (
-                  <tr key={q.id} className="hover:bg-(--muted)/40 transition-colors group">
-                    <td className="px-5 py-3.5">
-                      <div>
-                        <p className="font-medium text-(--foreground)">{q.name}</p>
-                        <p className="text-xs text-(--muted-foreground)">{q.email}</p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-(--muted-foreground) whitespace-nowrap">{q.service_type}</td>
-                    <td className="px-5 py-3.5 text-(--muted-foreground)">{q.phone || "—"}</td>
-                    <td className="px-5 py-3.5 text-(--muted-foreground) whitespace-nowrap">
-                      {new Date(q.created_at).toLocaleDateString(ar ? "ar-SA" : "en-GB")}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[q.status]}`}>
-                        {STATUS_LABEL[q.status][language as "ar" | "en"]}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <button
-                        onClick={() => setSelectedQuote(q)}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-(--muted) hover:bg-(--primary) hover:text-(--primary-foreground) text-(--muted-foreground) transition-colors font-medium"
-                      >
-                        {ar ? "عرض" : "View"}
-                      </button>
-                    </td>
+          <>
+            {/* Mobile: stacked cards */}
+            <div className="sm:hidden divide-y divide-(--border)">
+              {filtered.map(q => (
+                <button
+                  key={q.id}
+                  onClick={() => setSelectedQuote(q)}
+                  className="w-full text-start p-4 space-y-2 hover:bg-(--muted)/30 transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium text-(--foreground) truncate">{q.name}</p>
+                    <span className={`shrink-0 inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[q.status]}`}>
+                      {STATUS_LABEL[q.status][language as "ar" | "en"]}
+                    </span>
+                  </div>
+                  <p className="text-xs text-(--muted-foreground) truncate">{q.email}</p>
+                  <div className="flex items-center justify-between text-xs text-(--muted-foreground)">
+                    <span>{q.service_type}</span>
+                    <span>{new Date(q.created_at).toLocaleDateString(ar ? "ar-SA" : "en-GB")}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Desktop / tablet: table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-(--border)">
+                    {[
+                      ar ? "الاسم"    : "Name",
+                      ar ? "الخدمة"   : "Service",
+                      ar ? "الهاتف"   : "Phone",
+                      ar ? "التاريخ"  : "Date",
+                      ar ? "الحالة"   : "Status",
+                      ar ? "إجراء"    : "Action",
+                    ].map(h => (
+                      <th key={h} className="text-start px-5 py-3 text-xs font-medium text-(--muted-foreground) whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-(--border)">
+                  {filtered.map(q => (
+                    <tr key={q.id} className="hover:bg-(--muted)/40 transition-colors group">
+                      <td className="px-5 py-3.5">
+                        <div>
+                          <p className="font-medium text-(--foreground)">{q.name}</p>
+                          <p className="text-xs text-(--muted-foreground)">{q.email}</p>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-(--muted-foreground) whitespace-nowrap">{q.service_type}</td>
+                      <td className="px-5 py-3.5 text-(--muted-foreground)">{q.phone || "—"}</td>
+                      <td className="px-5 py-3.5 text-(--muted-foreground) whitespace-nowrap">
+                        {new Date(q.created_at).toLocaleDateString(ar ? "ar-SA" : "en-GB")}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[q.status]}`}>
+                          {STATUS_LABEL[q.status][language as "ar" | "en"]}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <button
+                          onClick={() => setSelectedQuote(q)}
+                          className="text-xs px-3 py-1.5 rounded-lg bg-(--muted) hover:bg-(--primary) hover:text-(--primary-foreground) text-(--muted-foreground) transition-colors font-medium"
+                        >
+                          {ar ? "عرض" : "View"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

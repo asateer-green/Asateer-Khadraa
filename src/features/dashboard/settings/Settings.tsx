@@ -22,8 +22,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // ── Row ────────────────────────────────────────────────────────────────────
 function Row({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <div>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="min-w-0">
         <p className="text-sm font-medium text-(--foreground)">{label}</p>
         {sub && <p className="text-xs text-(--muted-foreground) mt-0.5">{sub}</p>}
       </div>
@@ -106,7 +106,7 @@ const Settings = () => {
           label={ar ? "البريد الإلكتروني" : "Email"}
           sub={ar ? "لا يمكن تغييره" : "Cannot be changed"}
         >
-          <span className="text-sm text-(--muted-foreground) bg-(--muted) px-3 py-1.5 rounded-lg">
+          <span className="text-sm text-(--muted-foreground) bg-(--muted) px-3 py-1.5 rounded-lg max-w-full truncate">
             {user?.email ?? "—"}
           </span>
         </Row>

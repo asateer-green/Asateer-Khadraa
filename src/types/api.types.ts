@@ -57,6 +57,7 @@ export interface Category {
   name_ar:   string;
   name_en:   string;
   created_at: string;
+  image_url?: string;
 }
 
 // ── Generic API response wrappers ─────────────────────────────────────────

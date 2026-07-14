@@ -163,7 +163,7 @@ function RecentQuotes({ language }: { language: string }) {
         </Link>
       </div>
 
-      {/* Table */}
+      {/* Content */}
       {isLoading ? (
         <div className="p-5 space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -182,54 +182,83 @@ function RecentQuotes({ language }: { language: string }) {
           {language === "ar" ? "لا توجد طلبات بعد" : "No quotes yet"}
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-(--border)">
-                {[
-                  language === "ar" ? "الاسم" : "Name",
-                  language === "ar" ? "الخدمة" : "Service",
-                  language === "ar" ? "التاريخ" : "Date",
-                  language === "ar" ? "الحالة" : "Status",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="text-start px-5 py-3 text-xs font-medium text-(--muted-foreground)"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-(--border)">
-              {recent.map((q: Quote) => (
-                <tr
-                  key={q.id}
-                  className="hover:bg-(--muted)/40 transition-colors"
-                >
-                  <td className="px-5 py-3 font-medium text-(--foreground) whitespace-nowrap">
+        <>
+          {/* Mobile: stacked cards */}
+          <div className="sm:hidden divide-y divide-(--border)">
+            {recent.map((q: Quote) => (
+              <div key={q.id} className="p-4 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-(--foreground) truncate">
                     {q.name}
-                  </td>
-                  <td className="px-5 py-3 text-(--muted-foreground) whitespace-nowrap">
-                    {q.service_type}
-                  </td>
-                  <td className="px-5 py-3 text-(--muted-foreground) whitespace-nowrap">
+                  </span>
+                  <span
+                    className={`shrink-0 inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[q.status] ?? ""}`}
+                  >
+                    {statusLabel[q.status]?.[language] ?? q.status}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-(--muted-foreground)">
+                  <span>{q.service_type}</span>
+                  <span>
                     {new Date(q.created_at).toLocaleDateString(
                       language === "ar" ? "ar-SA" : "en-GB",
                     )}
-                  </td>
-                  <td className="px-5 py-3">
-                    <span
-                      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[q.status] ?? ""}`}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop / tablet: table */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-(--border)">
+                  {[
+                    language === "ar" ? "الاسم" : "Name",
+                    language === "ar" ? "الخدمة" : "Service",
+                    language === "ar" ? "التاريخ" : "Date",
+                    language === "ar" ? "الحالة" : "Status",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="text-start px-5 py-3 text-xs font-medium text-(--muted-foreground)"
                     >
-                      {statusLabel[q.status]?.[language] ?? q.status}
-                    </span>
-                  </td>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-(--border)">
+                {recent.map((q: Quote) => (
+                  <tr
+                    key={q.id}
+                    className="hover:bg-(--muted)/40 transition-colors"
+                  >
+                    <td className="px-5 py-3 font-medium text-(--foreground) whitespace-nowrap">
+                      {q.name}
+                    </td>
+                    <td className="px-5 py-3 text-(--muted-foreground) whitespace-nowrap">
+                      {q.service_type}
+                    </td>
+                    <td className="px-5 py-3 text-(--muted-foreground) whitespace-nowrap">
+                      {new Date(q.created_at).toLocaleDateString(
+                        language === "ar" ? "ar-SA" : "en-GB",
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      <span
+                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[q.status] ?? ""}`}
+                      >
+                        {statusLabel[q.status]?.[language] ?? q.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );
@@ -272,7 +301,7 @@ function QuickActions({ language }: { language: string }) {
           {language === "ar" ? "إجراءات سريعة" : "Quick Actions"}
         </h2>
       </div>
-      <div className="p-3 grid grid-cols-2 gap-2">
+      <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-2">
         {actions.map((a) => (
           <Link
             key={a.to}
@@ -387,7 +416,7 @@ const DashboardHome = () => {
       </div>
 
       {/* ── Stat cards ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label={t("dashboard.totalQuotes")}
           value={quoteStats.data?.total}

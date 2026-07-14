@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useLanguageContext } from "../../../../app/providers/LanguageProvider";
 import { ROUTES } from "../../../../app/config/routes";
-import { Award, Building2, FileCheck, ShieldCheck } from "lucide-react"; // استيراد أيقونات متطابقة وقريبة جداً لشكل الصورة
+import { Award, Building2, ShieldCheck } from "lucide-react"; // استيراد أيقونات متطابقة وقريبة جداً لشكل الصورة
 
 export function AboutSection() {
   const { t, language } = useLanguageContext();
@@ -21,12 +21,6 @@ export function AboutSection() {
     },
     {
       id: 3,
-      icon: FileCheck,
-      text_ar: "التزام كامل بكود البناء السعودي SBC والمواصفات القياسية SASO واشتراطات الدفاع المدني والمعايير الدولية.",
-      text_en: "Full compliance with the Saudi Building Code (SBC), SASO standards, civil defense regulations, and international metrics."
-    },
-    {
-      id: 4,
       icon: ShieldCheck,
       text_ar: "فريق هندسي متخصص يقدم خدمات التصميم والدراسات الإنشائية والتركيب والصيانة الدورية الشاملة.",
       text_en: "A specialized engineering team providing design, structural studies, installation, and comprehensive routine maintenance."

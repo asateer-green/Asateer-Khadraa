@@ -122,7 +122,7 @@ const LogosManager = () => {
     <div className="max-w-4xl mx-auto space-y-5">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-(--foreground)">
             {ar ? "معرض الشعارات" : "Logos Manager"}
@@ -133,7 +133,7 @@ const LogosManager = () => {
         </div>
         <button
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             {showForm
@@ -161,7 +161,7 @@ const LogosManager = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* Titles */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-(--foreground)">{ar ? "الاسم بالعربي" : "Name (Arabic)"} *</label>
                 <input
@@ -205,7 +205,7 @@ const LogosManager = () => {
             </div>
 
             {/* Image input */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-(--foreground)">{ar ? "الترتيب" : "Order"}</label>
                 <input
@@ -215,7 +215,7 @@ const LogosManager = () => {
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
               </div>
-              <div className="col-span-2 space-y-1.5">
+              <div className="sm:col-span-2 space-y-1.5">
                 <label className="text-sm font-medium text-(--foreground)">
                   {uploadMode === "url" ? (ar ? "رابط الصورة" : "Image URL") : (ar ? "ملف الصورة" : "Image File")}
                 </label>
@@ -304,7 +304,7 @@ const LogosManager = () => {
                 <button
                   onClick={() => setDeleteId(logo.id)}
                   aria-label={ar ? "حذف" : "Delete"}
-                  className="absolute top-2 end-2 w-7 h-7 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
+                  className="absolute top-2 inset-e-2 w-7 h-7 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>

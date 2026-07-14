@@ -1,20 +1,14 @@
 // src/components/layout/Sidebar.tsx
-import { useState, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../hooks/ui/useLanguage";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { ROUTES } from "../../app/config/routes";
-import Logo from "../../assets/logos/favicon.ico"
+import Logo from "../../assets/logos/favicon.ico";
+
 
 // ── Nav items config ───────────────────────────────────────────────────────
-type NavItem = {
-  key: string;
-  path: string;
-  icon: ReactNode;
-  exact?: boolean;
-};
-
-const NAV_ITEMS: ReadonlyArray<NavItem> = [
+const NAV_ITEMS = [
   {
     key:   "overview",
     path:  ROUTES.DASHBOARD,
@@ -30,6 +24,7 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
   {
     key:  "services",
     path: ROUTES.DASHBOARD_SERVICES,
+    exact: false,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -40,6 +35,7 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
   {
     key:  "signage",
     path: ROUTES.DASHBOARD_SIGNAGE,
+    exact: false,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -49,22 +45,9 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
     ),
   },
   {
-    key:  "logos", 
-    path: "/dashboard/logos/", // أو ROUTES.DASHBOARD_LOGOS إذا كانت معرّفة بالكامل هناك
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19H12V22Z" />
-        <circle cx="7.5" cy="10.5" r="1.5" />
-        <circle cx="11.5" cy="7.5" r="1.5" />
-        <circle cx="16.5" cy="9.5" r="1.5" />
-        <circle cx="15.5" cy="14.5" r="1.5" />
-      </svg>
-    ),
-  },
-  {
     key:  "portfolio",
     path: ROUTES.DASHBOARD_PORTFOLIO,
+    exact: false,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -76,6 +59,7 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
   {
     key:  "categories",
     path: ROUTES.DASHBOARD_CATEGORIES,
+    exact: false,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -88,6 +72,7 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
   {
     key:  "quotes",
     path: ROUTES.DASHBOARD_QUOTES,
+    exact: false,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -98,8 +83,23 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
     ),
   },
   {
+    key:  "logos",
+    path: "/dashboard/logos",
+    exact: false,
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+        <line x1="9" y1="9" x2="9.01" y2="9"/>
+        <line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+    ),
+  },
+  {
     key:  "settings",
     path: ROUTES.DASHBOARD_SETTINGS,
+    exact: false,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -108,14 +108,45 @@ const NAV_ITEMS: ReadonlyArray<NavItem> = [
       </svg>
     ),
   },
-];
+] as const;
+
+// Breakpoint (px) below which the sidebar should start collapsed
+const MOBILE_BREAKPOINT = 768;
+
+function getIsMobile() {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < MOBILE_BREAKPOINT;
+}
 
 // ── Sidebar ────────────────────────────────────────────────────────────────
 export function Sidebar() {
   const { t, direction } = useLanguage();
   const { logout, user }  = useAuthContext();
   const navigate          = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(getIsMobile);
+  // Start collapsed on mobile/small screens, expanded on desktop
+  const [collapsed, setCollapsed] = useState(getIsMobile);
+
+  // Keep it in sync with viewport changes (e.g. rotation, resizing window)
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = getIsMobile();
+      setIsMobile(mobile);
+      setCollapsed(mobile);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Lock body scroll while the sidebar is open as an overlay on mobile
+  useEffect(() => {
+    if (isMobile && !collapsed) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prevOverflow; };
+    }
+  }, [isMobile, collapsed]);
 
   const handleLogout = async () => {
     await logout();
@@ -123,21 +154,44 @@ export function Sidebar() {
   };
 
   const isRtl = direction === "rtl";
+  const isOverlay = isMobile && !collapsed;
 
   return (
-    <aside
-      data-collapsed={collapsed}
-      className={`${collapsed ? "w-16" : "w-60"} 
-        relative flex flex-col h-screen shrink-0 overflow-hidden
-        bg-(--card) border-e border-(--border)
-        transition-[width] duration-300 ease-in-out
-      `}
-    >
+    <>
+      {/* Backdrop: only shown when the sidebar is open as an overlay on mobile */}
+      {isOverlay && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-200"
+          onClick={() => setCollapsed(true)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        data-collapsed={collapsed}
+        style={{
+          width: collapsed ? "64px" : "240px",
+          ...(isOverlay
+            ? {
+                position: "fixed",
+                top: 0,
+                bottom: 0,
+                [isRtl ? "right" : "left"]: 0,
+                zIndex: 50,
+              }
+            : {}),
+        }}
+        className="
+          relative flex flex-col h-screen shrink-0 overflow-hidden
+          bg-(--card) border-e border-(--border)
+          transition-[width] duration-300 ease-in-out
+        "
+      >
       {/* ── Brand ─────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-(--border) shrink-0">
         {/* Logo mark */}
         <div className="shrink-0 w-8 h-8 rounded-lg bg-(--primary) flex items-center justify-center text-(--primary-foreground) font-bold text-sm select-none">
-       <img
+         <img
               src={Logo}
               alt="Logo"
               className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-105"
@@ -215,7 +269,6 @@ export function Sidebar() {
         <button
           onClick={handleLogout}
           title={t("nav.logout")}
-          type="button"
           className="
             w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
             text-(--muted-foreground) hover:bg-red-50 hover:text-red-600
@@ -236,7 +289,6 @@ export function Sidebar() {
         <button
           onClick={() => setCollapsed(v => !v)}
           aria-label={collapsed ? "توسيع الشريط الجانبي" : "طي الشريط الجانبي"}
-          type="button"
           className="
             w-full flex items-center justify-center py-2 rounded-xl text-sm
             text-(--muted-foreground) hover:bg-(--muted) hover:text-(--foreground)
@@ -246,15 +298,19 @@ export function Sidebar() {
           <svg
             width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-            className={`transform transition-transform duration-300 ease ${isRtl
-              ? collapsed ? "rotate-180" : "rotate-0"
-              : collapsed ? "rotate-0" : "rotate-180"}`}
+            style={{
+              transform: isRtl
+                ? collapsed ? "rotate(180deg)" : "rotate(0deg)"
+                : collapsed ? "rotate(0deg)"   : "rotate(180deg)",
+              transition: "transform 300ms ease"
+            }}
           >
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </button>
       </div>
     </aside>
+    </>
   );
 }
 
