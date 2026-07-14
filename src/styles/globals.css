@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ASATEER GREEN – MODERN OKLCH THEME (Tailwind CSS v4 @theme)
+   ============================================================ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-brand: var(--brand);
+  --color-brand-glow: var(--brand-glow);
+
+  /* الخريطة التوافقية للأسماء القديمة لضمان عدم تلف أي صفحة */
+  --color-brand-50: oklch(0.95 0.05 145);
+  --color-brand-100: oklch(0.90 0.10 145);
+  --color-brand-200: oklch(0.85 0.15 145);
+  --color-brand-300: oklch(0.82 0.18 145);
+  --color-brand-400: oklch(0.80 0.20 145);
+  --color-brand-500: var(--brand);
+  --color-brand-600: oklch(0.70 0.20 145);
+  --color-brand-700: oklch(0.60 0.18 145);
+  --color-brand-800: oklch(0.50 0.15 145);
+  --color-brand-900: oklch(0.40 0.12 145);
+
+  --color-dark-950: oklch(0.18 0.04 200);
+  --color-dark-900: oklch(0.20 0.04 200);
+  --color-dark-850: var(--background);
+  --color-dark-800: var(--surface);
+  --color-dark-750: var(--card);
+  --color-dark-700: var(--border);
+
+  --font-sans: "Inter", "Tajawal", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Tajawal", system-ui, sans-serif;
+  --font-arabic: "Tajawal", "Inter", system-ui, sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+    1️⃣ الوضع الفاتح الافتراضي (LIGHT MODE) - درجات مريحة وراقية من الـ Oklch
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --radius: 0.75rem;
+
+  /* الخلفيات الفاتحة الساطعة والنصوص الداكنة لسهولة القراءة */
+  --background: oklch(0.98 0.01 200);
+  --surface: oklch(0.94 0.015 200);
+  --surface-elevated: oklch(0.90 0.02 200);
+  --foreground: oklch(0.21 0.04 200);
+
+  /* الكروت والـ Popovers باللون الأبيض/الفاتح النقي */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.04 200);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.04 200);
+
+  /* درجات الأخضر للهوية (براند أساطير خضراء) - تم ضبط الإضاءة لتناسب الفاتح */
+  --brand: oklch(0.65 0.20 145); 
+  --brand-glow: oklch(0.55 0.18 145);
+  --primary: oklch(0.65 0.20 145);
+  --primary-foreground: oklch(0.98 0.01 200);
+
+  --secondary: oklch(0.90 0.02 200);
+  --secondary-foreground: oklch(0.21 0.04 200);
+
+  --muted: oklch(0.92 0.01 200);
+  --muted-foreground: oklch(0.45 0.02 200);
+
+  --accent: oklch(0.65 0.20 145);
+  --accent-foreground: oklch(0.98 0.01 200);
+
+  --destructive: oklch(0.60 0.20 25);
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.21 0.04 200 / 12%);
+  --input: oklch(0.21 0.04 200 / 15%);
+  --ring: oklch(0.65 0.20 145);
+
+  /* الـ Gradients والـ Shadows الخاصة بالوضع الفاتح */
+  --gradient-hero: linear-gradient(135deg, oklch(0.96 0.01 200) 0%, oklch(0.92 0.02 195) 60%, oklch(0.88 0.04 165) 100%);
+  --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-glow) 100%);
+  --gradient-fade: linear-gradient(180deg, transparent 0%, oklch(0.98 0.01 200) 100%);
+
+  --shadow-glow: 0 20px 60px -20px color-mix(in oklab, var(--brand) 25%, transparent);
+  --shadow-card: 0 10px 30px -10px oklch(0 0 0 / 8%);
+
+  --transition-smooth: 400ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* الأسماء القديمة للـ Light Mode */
+  --color-bg-primary: var(--background);
+  --color-bg-secondary: var(--surface);
+  --color-bg-card: var(--card);
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent-muted: color-mix(in srgb, var(--brand) 8%, var(--card));
+  --color-bg-glow: linear-gradient(180deg, oklch(0.96 0.01 200) 0%, color-mix(in srgb, var(--brand) 1.5%, oklch(0.98 0.01 200)) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+    2️⃣ الوضع الداكن الديناميكي (DARK MODE) - يُفعل عند وجود كلاس .dark
+   ───────────────────────────────────────────────────────────────────────────── */
+.dark {
+  /* نقل درجات الـ Dark Teal / Navy Base الأصلية الخاصة بكِ إلى هنا */
+  --background: oklch(0.21 0.04 200);
+  --surface: oklch(0.25 0.045 200);
+  --surface-elevated: oklch(0.29 0.05 200);
+  --foreground: oklch(0.98 0.01 200);
+
+  --card: oklch(0.25 0.045 200);
+  --card-foreground: oklch(0.98 0.01 200);
+  --popover: oklch(0.25 0.045 200);
+  --popover-foreground: oklch(0.98 0.01 200);
+
+  /* درجات الأخضر المصفر الدافئ (Warm Lime) للـ Dark Mode */
+  --brand: oklch(0.78 0.21 145);
+  --brand-glow: oklch(0.88 0.22 145);
+  --primary: oklch(0.78 0.21 145);
+  --primary-foreground: oklch(0.18 0.04 200);
+
+  --secondary: oklch(0.3 0.05 200);
+  --secondary-foreground: oklch(0.98 0.01 200);
+
+  --muted: oklch(0.28 0.04 200);
+  --muted-foreground: oklch(0.72 0.03 200);
+
+  --accent: oklch(0.78 0.21 145);
+  --accent-foreground: oklch(0.18 0.04 200);
+
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 200);
+
+  --border: oklch(0.35 0.04 200 / 60%);
+  --input: oklch(0.32 0.04 200);
+  --ring: oklch(0.78 0.21 145);
+
+  /* إعادة حساب الـ Gradients والـ Shadows لتناسب عمق الغامق */
+  --gradient-hero: linear-gradient(135deg, oklch(0.18 0.04 200) 0%, oklch(0.26 0.06 195) 60%, oklch(0.32 0.1 165) 100%);
+  --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-glow) 100%);
+  --gradient-fade: linear-gradient(180deg, transparent 0%, oklch(0.21 0.04 200) 100%);
+
+  --shadow-glow: 0 20px 60px -20px color-mix(in oklab, var(--brand) 45%, transparent);
+  --shadow-card: 0 10px 30px -10px oklch(0 0 0 / 40%);
+
+  /* الأسماء القديمة للـ Dark Mode لضمان ثبات الهيكل */
+  --color-bg-primary: var(--background);
+  --color-bg-secondary: var(--surface);
+  --color-bg-card: var(--card);
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent-muted: color-mix(in srgb, var(--brand) 12%, var(--card));
+  --color-bg-glow: linear-gradient(180deg, oklch(0.20 0.04 200) 0%, color-mix(in srgb, var(--brand) 2.2%, oklch(0.18 0.04 200)) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+    3️⃣ الطبقات الأساسية (BASE LAYERS) والمرافق (UTILITIES)
+   ───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    border-color: var(--color-border);
+    transition: background-color var(--transition-smooth), border-color var(--transition-smooth), color var(--transition-smooth);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html[dir="rtl"] body {
+    font-family: var(--font-arabic);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4 {
+    font-family: var(--font-arabic);
+    letter-spacing: 0;
+  }
+
+  ::selection {
+    background-color: var(--brand);
+    color: var(--primary-foreground);
+  }
+}
+
+@layer utilities {
+  .bg-gradient-hero { 
+    background-image: 
+      linear-gradient(135deg, var(--background) 0%, color-mix(in oklab, var(--background) 85%, transparent) 90%, var(--color-background) 100%),
+      url('/hero-bg.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .bg-gradient-brand { background-image: var(--gradient-brand); }
+  .bg-gradient-fade { background-image: var(--gradient-fade); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .transition-smooth { transition: all var(--transition-smooth); }
+
+  .text-gradient {
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
