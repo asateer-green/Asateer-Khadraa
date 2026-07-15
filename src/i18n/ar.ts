@@ -22,7 +22,7 @@ const ar = {
     home: "الرئيسية",
     about: "من نحن",
     services: "خدماتنا",
-    portfolio: "المنتجات",
+    portfolio: "معرض الاعمال",
     contact: "تواصل معنا",
     quoteRequest: "طلب عرض سعر",
     dashboard: "لوحة التحكم",

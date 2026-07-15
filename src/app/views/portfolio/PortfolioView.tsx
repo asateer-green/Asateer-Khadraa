@@ -174,18 +174,18 @@ export function PortfolioView() {
     },
   ];
 
-  // 3. هيكلة المشاريع القادمة من قاعدة البيانات ديناميكياً
+ // 3. هيكلة المشاريع القادمة من قاعدة البيانات ديناميكياً
   const dynamicProjects = dbProjects
-    ? dbProjects
-        .filter((p: any) => p.is_active !== false)
-        .map((p: any) => ({
+    ? dbProjects.map((p: any) => ({
           title: language === "ar" ? p.title_ar : p.title_en,
-          category: language === "ar" ? p.category_ar : p.category_en,
-          description: language === "ar" ? p.desc_ar : p.desc_en,
-          client: language === "ar" ? p.client_ar : p.client_en,
+          category: language === "ar" ? p.category_id : p.category_id, // أو اتركي التخصيص حسب الكود الحالي لديكِ
+          description: language === "ar" ? p.description_ar : p.description_en, // القراءة من الحقول الجديدة في الجدول
+          client: p.client || "—", // القراءة مباشرة من حقل client الجديد
           year: p.year || "—",
-          scope: language === "ar" ? p.scope_ar || [] : p.scope_en || [],
-          gallery: p.gallery && p.gallery.length > 0 ? p.gallery : [p.image_url],
+          scope: language === "ar" 
+            ? (p.scope_ar ? (Array.isArray(p.scope_ar) ? p.scope_ar : p.scope_ar.split(',').map((s: string) => s.trim())) : []) 
+            : (p.scope_en ? (Array.isArray(p.scope_en) ? p.scope_en : p.scope_en.split(',').map((s: string) => s.trim())) : []),
+          gallery: p.image_url ? [p.image_url] : [],
           image_url: p.image_url
         }))
     : [];
@@ -516,3 +516,4 @@ export function PortfolioView() {
 }
 
 export default PortfolioView;
+

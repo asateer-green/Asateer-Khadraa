@@ -1,4 +1,15 @@
 // src/features/dashboard/portfolio-manager/PortfolioManager.tsx
+//
+// ملاحظة: تمت إضافة حقول (description_ar, description_en, client, year, scope_ar, scope_en)
+// لأن نافذة المعاينة وصفحة الموقع كانتا تعرضانها بالفعل لكن نموذج الإضافة/التعديل لم يكن
+// يسمح بإدخالها. تأكد من إضافة هذه الحقول إلى PortfolioItem في types/api.types.ts وإلى
+// الـ API/الجدول في الباك إند حتى يتم حفظها فعلياً.
+//
+// Note: (description_ar, description_en, client, year, scope_ar, scope_en) were added because
+// the preview modal and the public site were already displaying them, but the Add/Edit form
+// never collected them. Make sure PortfolioItem in types/api.types.ts and the backend
+// table/API are updated to persist these fields.
+
 import { useState } from "react";
 import {
   usePortfolio,
@@ -9,7 +20,7 @@ import {
 import { useLanguage } from "../../../hooks/ui/useLanguage";
 import type { PortfolioItem } from "../../../types/api.types";
 
-// استيراد الأيقونات المطلوبة للنافذة الفاخرة وسلايدر الصور
+// استيراد الأيقونات المطلوبة للنافذة الفاخرة وسلايدر الصور والحقول التفاعلية
 import {
   X,
   ChevronLeft,
@@ -17,14 +28,32 @@ import {
   Calendar,
   User,
   Layers,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 const EMPTY_FORM = {
-  title_ar:    "",
-  title_en:    "",
-  category_id: "",
-  image_url:   "",
-  is_featured: false,
+  title_ar:       "",
+  title_en:       "",
+  category_id:    "",
+  image_url:      "",
+  description_ar: "",
+  description_en: "",
+  client:         "",
+  year:           "",
+  scope_ar:       "", // مفصولة بفواصل، تتحول إلى مصفوفة عند الحفظ
+  scope_en:       "", // comma separated, converted to an array on save
+  is_featured:    false,
+  gallery:        "",
+};
+
+// يحوّل "أ, ب, ج" إلى ["أ","ب","ج"] ويتجاهل الفراغات بشكل آمن
+const toTags = (raw: any): string[] => {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    return raw.split(",").map(s => s.trim()).filter(Boolean);
+  }
+  return [];
 };
 
 // ── Portfolio Form Modal ───────────────────────────────────────────────────
@@ -41,11 +70,22 @@ function PortfolioModal({
   const [form, setForm] = useState(
     initial
       ? {
-          title_ar:    initial.title_ar,
-          title_en:    initial.title_en,
-          category_id: initial.category_id ?? "",
-          image_url:   initial.image_url   ?? "",
-          is_featured: initial.is_featured,
+          title_ar:       initial.title_ar,
+          title_en:       initial.title_en,
+          category_id:    initial.category_id    ?? "",
+          image_url:      initial.image_url      ?? "",
+          description_ar: (initial as any).description_ar ?? "",
+          description_en: (initial as any).description_en ?? "",
+          client:         (initial as any).client         ?? "",
+          year:           (initial as any).year           ?? "",
+          scope_ar: Array.isArray((initial as any).scope_ar)
+            ? (initial as any).scope_ar.join(", ")
+            : (typeof (initial as any).scope_ar === "string" ? (initial as any).scope_ar : ""),
+          scope_en: Array.isArray((initial as any).scope_en)
+            ? (initial as any).scope_en.join(", ")
+            : (typeof (initial as any).scope_en === "string" ? (initial as any).scope_en : ""),
+          is_featured:    initial.is_featured,
+          gallery:        (initial as any).gallery        ?? "",
         }
       : EMPTY_FORM
   );
@@ -53,10 +93,46 @@ function PortfolioModal({
   const set = (key: keyof typeof EMPTY_FORM, value: string | boolean) =>
     setForm(f => ({ ...f, [key]: value }));
 
+  // الـ State المسؤول عن الحقول الديناميكية لمعرض الصور المصغرة (روابط إضافية)
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(() => {
+    if (initial && (initial as any).gallery) {
+      const rawGallery = (initial as any).gallery;
+      if (Array.isArray(rawGallery)) return rawGallery;
+      return rawGallery.split(",").map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [""]; // حقل إدخال واحد فارغ مبدئياً عند إضافة مشروع جديد
+  });
+
+  // إضافة حقل إدخال رابط صورة جديد إلى المعرض
+  const handleAddGalleryField = () => {
+    setGalleryUrls([...galleryUrls, ""]);
+  };
+
+  // حذف حقل صورة معين من المعرض
+  const handleRemoveGalleryField = (index: number) => {
+    const updated = galleryUrls.filter((_, idx) => idx !== index);
+    setGalleryUrls(updated.length > 0 ? updated : [""]); // إبقاء حقل واحد كحد أدنى بدلاً من تركه فارغاً تماماً
+  };
+
+  // تحديث قيمة الرابط في حقل معين بناءً على الـ index
+  const handleGalleryUrlChange = (index: number, value: string) => {
+    const updated = [...galleryUrls];
+    updated[index] = value;
+    setGalleryUrls(updated);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title_ar.trim() || !form.title_en.trim()) return;
-    onSave(form);
+    
+    // تصفية الروابط الفارغة وتحويل مصفوفة المعرض إلى نص مفصول بفاصلة
+    const cleanGallery = galleryUrls.filter(url => url.trim() !== "").join(", ");
+    
+    // نرسل الـ form كاملاً متضمناً الـ gallery المصفى
+    onSave({
+      ...form,
+      gallery: cleanGallery
+    });
   };
 
   const isEdit = !!initial;
@@ -72,7 +148,7 @@ function PortfolioModal({
           <h2 className="text-base font-semibold text-(--foreground)">
             {isEdit ? (ar ? "تعديل العمل" : "Edit Item") : (ar ? "إضافة عمل جديد" : "Add Portfolio Item")}
           </h2>
-          <button onClick={onClose} aria-label="إغلاق" className="w-8 h-8 rounded-lg flex items-center justify-center text-(--muted-foreground) hover:bg-(--muted) transition-colors">
+          <button type="button" onClick={onClose} aria-label="إغلاق" className="w-8 h-8 rounded-lg flex items-center justify-center text-(--muted-foreground) hover:bg-(--muted) transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -110,13 +186,13 @@ function PortfolioModal({
 
             {/* Image URL */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-(--foreground)">{ar ? "رابط الصورة" : "Image URL"}</label>
+              <label className="text-sm font-medium text-(--foreground)">{ar ? "رابط الصورة الرئيسية" : "Main Image URL"}</label>
               <input
                 value={form.image_url}
                 onChange={e => set("image_url", e.target.value)}
                 type="url"
                 placeholder="https://..."
-                title={ar ? "رابط الصورة" : "Image URL"}
+                title={ar ? "رابط الصورة الرئيسية" : "Main Image URL"}
                 className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
               />
               {form.image_url && (
@@ -127,6 +203,144 @@ function PortfolioModal({
                   onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               )}
+            </div>
+
+            {/* ── حقول إدخال معرض الصور المصغرة التفاعلي ── */}
+            <div className="space-y-2 border-t border-(--border) pt-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-(--foreground)">
+                  {ar ? "صور المعرض الإضافية" : "Additional Gallery Images"}
+                </label>
+                <button
+                  type="button"
+                  onClick={handleAddGalleryField}
+                  className="flex items-center gap-1 text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors px-2 py-1 rounded-lg hover:bg-emerald-500/10"
+                >
+                  <Plus className="w-4 h-4" />
+                  {ar ? "إضافة رابط صورة" : "Add Image URL"}
+                </button>
+              </div>
+
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {galleryUrls.map((url, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
+                      value={url}
+                      onChange={e => handleGalleryUrlChange(idx, e.target.value)}
+                      type="url"
+                      placeholder={ar ? `رابط صورة إضافية #${idx + 1}` : `Extra Image URL #${idx + 1}`}
+                      title={ar ? `رابط صورة إضافية #${idx + 1}` : `Extra Image URL #${idx + 1}`}
+                      className="flex-1 px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveGalleryField(idx)}
+                      disabled={galleryUrls.length === 1 && url === ""}
+                      className="p-2 rounded-xl text-red-500 hover:bg-red-500/10 hover:text-red-400 disabled:opacity-30 transition-all shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-(--muted-foreground)">
+                {ar 
+                  ? "* ستظهر هذه الصور المصغرة أسفل المعاينة لتمكين المستخدمين من التنقل بينها." 
+                  : "* These thumbnails will appear at the bottom of the preview modal."}
+              </p>
+            </div>
+
+            {/* Category */}
+            <div className="space-y-1.5 border-t border-(--border) pt-4">
+              <label className="text-sm font-medium text-(--foreground)">{ar ? "التصنيف" : "Category"}</label>
+              <input
+                value={form.category_id}
+                onChange={e => set("category_id", e.target.value)}
+                placeholder={ar ? "مثال: تصميم هوية" : "e.g. Branding"}
+                title={ar ? "التصنيف" : "Category"}
+                className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+              />
+            </div>
+
+            {/* Descriptions */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--foreground)">{ar ? "الوصف بالعربي" : "Description (Arabic)"}</label>
+                <textarea
+                  value={form.description_ar}
+                  onChange={e => set("description_ar", e.target.value)}
+                  dir="rtl"
+                  rows={3}
+                  placeholder={ar ? "تفاصيل المشروع..." : "Project details in Arabic..."}
+                  title={ar ? "الوصف بالعربي" : "Arabic description"}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring) resize-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--foreground)">{ar ? "الوصف بالإنجليزي" : "Description (English)"}</label>
+                <textarea
+                  value={form.description_en}
+                  onChange={e => set("description_en", e.target.value)}
+                  dir="ltr"
+                  rows={3}
+                  placeholder="Project details in English..."
+                  title={ar ? "الوصف بالإنجليزي" : "English description"}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring) resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Client & Year */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--foreground)">{ar ? "العميل" : "Client"}</label>
+                <input
+                  value={form.client}
+                  onChange={e => set("client", e.target.value)}
+                  placeholder={ar ? "اسم العميل" : "Client name"}
+                  title={ar ? "العميل" : "Client"}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--foreground)">{ar ? "السنة" : "Year"}</label>
+                <input
+                  value={form.year}
+                  onChange={e => set("year", e.target.value)}
+                  inputMode="numeric"
+                  placeholder="2026"
+                  title={ar ? "السنة" : "Year"}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                />
+              </div>
+            </div>
+
+            {/* Scope of work */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--foreground)">{ar ? "نطاق العمل بالعربي" : "Scope (Arabic)"}</label>
+                <input
+                  value={form.scope_ar}
+                  onChange={e => set("scope_ar", e.target.value)}
+                  dir="rtl"
+                  placeholder="تصميم هوية, إنتاج متكامل"
+                  title={ar ? "نطاق العمل بالعربي (افصل بينها بفواصل)" : "Scope tags, comma separated"}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                />
+                <p className="text-xs text-(--muted-foreground)">{ar ? "افصل بين الوسوم بفاصلة" : "Comma separated"}</p>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--foreground)">{ar ? "نطاق العمل بالإنجليزي" : "Scope (English)"}</label>
+                <input
+                  value={form.scope_en}
+                  onChange={e => set("scope_en", e.target.value)}
+                  dir="ltr"
+                  placeholder="Identity Craft, Production"
+                  title={ar ? "نطاق العمل بالإنجليزي (افصل بينها بفواصل)" : "Scope tags, comma separated"}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
+                />
+                <p className="text-xs text-(--muted-foreground)">{ar ? "افصل بين الوسوم بفاصلة" : "Comma separated"}</p>
+              </div>
             </div>
 
             {/* Featured toggle */}
@@ -175,7 +389,7 @@ function DeleteConfirm({ item, language, onClose, onConfirm, isDeleting }: {
   const ar = language === "ar";
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-sm rounded-2xl bg-(--card) border border-(--border) shadow-xl p-6 space-y-4">
+      <div className="w-full max-sm rounded-2xl bg-(--card) border border-(--border) shadow-xl p-6 space-y-4">
         <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center mx-auto">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
@@ -222,7 +436,12 @@ const PortfolioManager = () => {
   const filtered = filter === "featured" ? items.filter(i => i.is_featured) : items;
 
   const handleSave = (data: typeof EMPTY_FORM) => {
-    const payload = { ...data, category_id: data.category_id || undefined };
+    const payload = {
+      ...data,
+      category_id: data.category_id || undefined,
+      scope_ar: toTags(data.scope_ar),
+      scope_en: toTags(data.scope_en),
+    };
     if (editItem) {
       updateItem({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
     } else {
@@ -230,19 +449,44 @@ const PortfolioManager = () => {
     }
   };
 
-  // معالجة وإعداد بيانات العمل لكي يتم عرضها بشكل فاخر داخل الـ Slider والـ Modal
+  // معالجة وإعداد بيانات العمل الحقيقية لعرضها في نافذة المعاينة الفاخرة
   const handleOpenPreview = (item: PortfolioItem) => {
+    const it = item as any;
+    const description = ar ? it.description_ar : it.description_en;
+    
+    // 1. تحويل نطاق العمل لمصفوفة
+    const rawScope = ar ? it.scope_ar : it.scope_en;
+    const scope = rawScope 
+      ? (Array.isArray(rawScope) ? rawScope : rawScope.split(',').map((s: string) => s.trim()).filter(Boolean))
+      : [];
+
+    // 2. تحويل الصور المتعددة (الجاليري) لمصفوفة روابط
+    const rawGallery = it.gallery || it.images;
+    let gallery: string[] = [];
+    if (rawGallery) {
+      gallery = Array.isArray(rawGallery) 
+        ? rawGallery 
+        : rawGallery.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    // إذا لم يكن هناك جاليري، نضع الصورة الأساسية كأول صورة في المصفوفة
+    if (gallery.length === 0 && item.image_url) {
+      gallery.push(item.image_url);
+    }
+
     const formattedItem = {
       title: ar ? item.title_ar : item.title_en,
-      category: ar ? "معرض الأعمال" : "Portfolio Showcase",
-      description: ar 
-        ? `تفاصيل تصميم وتنفيذ مشروع "${item.title_ar}" كجزء من الهويات البصرية والمطبوعات الإعلانية الفاخرة.` 
-        : `Design and execution blueprint details of the "${item.title_en}" project under premium production lines.`,
-      client: ar ? "مؤسسة أساطير خضراء" : "Asateer Green Co.",
-      year: "2026",
-      scope: ar ? ["تصميم هوية", "إنتاج متكامل", "مراجعة فنية"] : ["Identity Craft", "Production", "Art Review"],
-      gallery: item.image_url ? [item.image_url] : [],
-      image_url: item.image_url
+      category: it.category_id || (ar ? "معرض الأعمال" : "Portfolio Showcase"),
+      description:
+        description && description.trim().length > 0
+          ? description
+          : (ar
+              ? "لم يتم إضافة تفاصيل عن المشروع بعد."
+              : "No project details have been added yet."),
+      client: it.client || "—",
+      year: it.year || "—",
+      scope,
+      gallery, // مصفوفة الصور الجاهزة للعرض
+      image_url: item.image_url,
     };
     setPreviewItem(formattedItem);
     setCurrentImgIndex(0);
@@ -466,21 +710,22 @@ const PortfolioManager = () => {
                 )}
               </div>
 
-              {previewItem.gallery && previewItem.gallery.length > 1 && (
-                <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1 justify-center">
+              {/* معرض الصور المصغرة */}
+              {previewItem.gallery && previewItem.gallery.length > 0 && (
+                <div className="flex items-center gap-3 mt-4 overflow-x-auto pb-1 justify-center max-w-full scrollbar-thin scrollbar-thumb-zinc-800">
                   {previewItem.gallery.map((img: string, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentImgIndex(idx)}
                       className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
                         currentImgIndex === idx
-                          ? "border-emerald-500 scale-105 shadow-md"
-                          : "border-transparent opacity-50 hover:opacity-100"
+                          ? "border-emerald-500 scale-105 shadow-md ring-2 ring-emerald-500/20"
+                          : "border-transparent opacity-50 hover:opacity-100 hover:border-zinc-700"
                       }`}
                     >
                       <img
                         src={img}
-                        alt="thumbnail"
+                        alt={`thumbnail-${idx}`}
                         className="w-full h-full object-cover"
                       />
                     </button>
