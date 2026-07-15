@@ -33,32 +33,39 @@ import {
 } from "lucide-react";
 
 const EMPTY_FORM = {
-  title_ar:       "",
-  title_en:       "",
-  category_id:    "",
-  image_url:      "",
+  title_ar: "",
+  title_en: "",
+  category_id: "",
+  image_url: "",
   description_ar: "",
   description_en: "",
-  client:         "",
-  year:           "",
-  scope_ar:       "", // مفصولة بفواصل، تتحول إلى مصفوفة عند الحفظ
-  scope_en:       "", // comma separated, converted to an array on save
-  is_featured:    false,
-  gallery:        "",
+  client: "",
+  year: "",
+  scope_ar: "", // مفصولة بفواصل، تتحول إلى مصفوفة عند الحفظ
+  scope_en: "", // comma separated, converted to an array on save
+  is_featured: false,
+  gallery: "",
 };
 
 // يحوّل "أ, ب, ج" إلى ["أ","ب","ج"] ويتجاهل الفراغات بشكل آمن
 const toTags = (raw: any): string[] => {
   if (Array.isArray(raw)) return raw;
   if (typeof raw === "string") {
-    return raw.split(",").map(s => s.trim()).filter(Boolean);
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   }
   return [];
 };
 
 // ── Portfolio Form Modal ───────────────────────────────────────────────────
 function PortfolioModal({
-  initial, language, onClose, onSave, isSaving,
+  initial,
+  language,
+  onClose,
+  onSave,
+  isSaving,
 }: {
   initial?: PortfolioItem;
   language: string;
@@ -70,35 +77,42 @@ function PortfolioModal({
   const [form, setForm] = useState(
     initial
       ? {
-          title_ar:       initial.title_ar,
-          title_en:       initial.title_en,
-          category_id:    initial.category_id    ?? "",
-          image_url:      initial.image_url      ?? "",
+          title_ar: initial.title_ar,
+          title_en: initial.title_en,
+          category_id: initial.category_id ?? "",
+          image_url: initial.image_url ?? "",
           description_ar: (initial as any).description_ar ?? "",
           description_en: (initial as any).description_en ?? "",
-          client:         (initial as any).client         ?? "",
-          year:           (initial as any).year           ?? "",
+          client: (initial as any).client ?? "",
+          year: (initial as any).year ?? "",
           scope_ar: Array.isArray((initial as any).scope_ar)
             ? (initial as any).scope_ar.join(", ")
-            : (typeof (initial as any).scope_ar === "string" ? (initial as any).scope_ar : ""),
+            : typeof (initial as any).scope_ar === "string"
+              ? (initial as any).scope_ar
+              : "",
           scope_en: Array.isArray((initial as any).scope_en)
             ? (initial as any).scope_en.join(", ")
-            : (typeof (initial as any).scope_en === "string" ? (initial as any).scope_en : ""),
-          is_featured:    initial.is_featured,
-          gallery:        (initial as any).gallery        ?? "",
+            : typeof (initial as any).scope_en === "string"
+              ? (initial as any).scope_en
+              : "",
+          is_featured: initial.is_featured,
+          gallery: (initial as any).gallery ?? "",
         }
-      : EMPTY_FORM
+      : EMPTY_FORM,
   );
 
   const set = (key: keyof typeof EMPTY_FORM, value: string | boolean) =>
-    setForm(f => ({ ...f, [key]: value }));
+    setForm((f) => ({ ...f, [key]: value }));
 
   // الـ State المسؤول عن الحقول الديناميكية لمعرض الصور المصغرة (روابط إضافية)
   const [galleryUrls, setGalleryUrls] = useState<string[]>(() => {
     if (initial && (initial as any).gallery) {
       const rawGallery = (initial as any).gallery;
       if (Array.isArray(rawGallery)) return rawGallery;
-      return rawGallery.split(",").map((s: string) => s.trim()).filter(Boolean);
+      return rawGallery
+        .split(",")
+        .map((s: string) => s.trim())
+        .filter(Boolean);
     }
     return [""]; // حقل إدخال واحد فارغ مبدئياً عند إضافة مشروع جديد
   });
@@ -124,14 +138,16 @@ function PortfolioModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title_ar.trim() || !form.title_en.trim()) return;
-    
+
     // تصفية الروابط الفارغة وتحويل مصفوفة المعرض إلى نص مفصول بفاصلة
-    const cleanGallery = galleryUrls.filter(url => url.trim() !== "").join(", ");
-    
+    const cleanGallery = galleryUrls
+      .filter((url) => url.trim() !== "")
+      .join(", ");
+
     // نرسل الـ form كاملاً متضمناً الـ gallery المصفى
     onSave({
       ...form,
-      gallery: cleanGallery
+      gallery: cleanGallery,
     });
   };
 
@@ -140,43 +156,69 @@ function PortfolioModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      onClick={e => e.target === e.currentTarget && onClose()}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-lg rounded-2xl bg-(--card) border border-(--border) shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-(--border) shrink-0">
           <h2 className="text-base font-semibold text-(--foreground)">
-            {isEdit ? (ar ? "تعديل العمل" : "Edit Item") : (ar ? "إضافة عمل جديد" : "Add Portfolio Item")}
+            {isEdit
+              ? ar
+                ? "تعديل العمل"
+                : "Edit Item"
+              : ar
+                ? "إضافة عمل جديد"
+                : "Add Portfolio Item"}
           </h2>
-          <button type="button" onClick={onClose} aria-label="إغلاق" className="w-8 h-8 rounded-lg flex items-center justify-center text-(--muted-foreground) hover:bg-(--muted) transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="إغلاق"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-(--muted-foreground) hover:bg-(--muted) transition-colors"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
           <div className="p-6 space-y-4">
-
             {/* Titles */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "العنوان بالعربي" : "Title (Arabic)"} *</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "العنوان بالعربي" : "Title (Arabic)"} *
+                </label>
                 <input
                   value={form.title_ar}
-                  onChange={e => set("title_ar", e.target.value)}
-                  required dir="rtl"
+                  onChange={(e) => set("title_ar", e.target.value)}
+                  required
+                  dir="rtl"
                   placeholder="اسم العمل"
                   title={ar ? "العنوان بالعربي" : "Arabic title"}
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "العنوان بالإنجليزي" : "Title (English)"} *</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "العنوان بالإنجليزي" : "Title (English)"} *
+                </label>
                 <input
                   value={form.title_en}
-                  onChange={e => set("title_en", e.target.value)}
-                  required dir="ltr"
+                  onChange={(e) => set("title_en", e.target.value)}
+                  required
+                  dir="ltr"
                   placeholder="Project name"
                   title={ar ? "العنوان بالإنجليزي" : "English title"}
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
@@ -186,10 +228,12 @@ function PortfolioModal({
 
             {/* Image URL */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-(--foreground)">{ar ? "رابط الصورة الرئيسية" : "Main Image URL"}</label>
+              <label className="text-sm font-medium text-(--foreground)">
+                {ar ? "رابط الصورة الرئيسية" : "Main Image URL"}
+              </label>
               <input
                 value={form.image_url}
-                onChange={e => set("image_url", e.target.value)}
+                onChange={(e) => set("image_url", e.target.value)}
                 type="url"
                 placeholder="https://..."
                 title={ar ? "رابط الصورة الرئيسية" : "Main Image URL"}
@@ -200,7 +244,9 @@ function PortfolioModal({
                   src={form.image_url}
                   alt="preview"
                   className="mt-2 h-40 w-full object-cover rounded-xl border border-(--border)"
-                  onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
                 />
               )}
             </div>
@@ -226,10 +272,20 @@ function PortfolioModal({
                   <div key={idx} className="flex gap-2 items-center">
                     <input
                       value={url}
-                      onChange={e => handleGalleryUrlChange(idx, e.target.value)}
+                      onChange={(e) =>
+                        handleGalleryUrlChange(idx, e.target.value)
+                      }
                       type="url"
-                      placeholder={ar ? `رابط صورة إضافية #${idx + 1}` : `Extra Image URL #${idx + 1}`}
-                      title={ar ? `رابط صورة إضافية #${idx + 1}` : `Extra Image URL #${idx + 1}`}
+                      placeholder={
+                        ar
+                          ? `رابط صورة إضافية #${idx + 1}`
+                          : `Extra Image URL #${idx + 1}`
+                      }
+                      title={
+                        ar
+                          ? `رابط صورة إضافية #${idx + 1}`
+                          : `Extra Image URL #${idx + 1}`
+                      }
                       className="flex-1 px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                     />
                     <button
@@ -244,18 +300,20 @@ function PortfolioModal({
                 ))}
               </div>
               <p className="text-[11px] text-(--muted-foreground)">
-                {ar 
-                  ? "* ستظهر هذه الصور المصغرة أسفل المعاينة لتمكين المستخدمين من التنقل بينها." 
+                {ar
+                  ? "* ستظهر هذه الصور المصغرة أسفل المعاينة لتمكين المستخدمين من التنقل بينها."
                   : "* These thumbnails will appear at the bottom of the preview modal."}
               </p>
             </div>
 
             {/* Category */}
             <div className="space-y-1.5 border-t border-(--border) pt-4">
-              <label className="text-sm font-medium text-(--foreground)">{ar ? "التصنيف" : "Category"}</label>
+              <label className="text-sm font-medium text-(--foreground)">
+                {ar ? "التصنيف" : "Category"}
+              </label>
               <input
                 value={form.category_id}
-                onChange={e => set("category_id", e.target.value)}
+                onChange={(e) => set("category_id", e.target.value)}
                 placeholder={ar ? "مثال: تصميم هوية" : "e.g. Branding"}
                 title={ar ? "التصنيف" : "Category"}
                 className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
@@ -265,22 +323,28 @@ function PortfolioModal({
             {/* Descriptions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "الوصف بالعربي" : "Description (Arabic)"}</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "الوصف بالعربي" : "Description (Arabic)"}
+                </label>
                 <textarea
                   value={form.description_ar}
-                  onChange={e => set("description_ar", e.target.value)}
+                  onChange={(e) => set("description_ar", e.target.value)}
                   dir="rtl"
                   rows={3}
-                  placeholder={ar ? "تفاصيل المشروع..." : "Project details in Arabic..."}
+                  placeholder={
+                    ar ? "تفاصيل المشروع..." : "Project details in Arabic..."
+                  }
                   title={ar ? "الوصف بالعربي" : "Arabic description"}
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring) resize-none"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "الوصف بالإنجليزي" : "Description (English)"}</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "الوصف بالإنجليزي" : "Description (English)"}
+                </label>
                 <textarea
                   value={form.description_en}
-                  onChange={e => set("description_en", e.target.value)}
+                  onChange={(e) => set("description_en", e.target.value)}
                   dir="ltr"
                   rows={3}
                   placeholder="Project details in English..."
@@ -293,20 +357,24 @@ function PortfolioModal({
             {/* Client & Year */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "العميل" : "Client"}</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "العميل" : "Client"}
+                </label>
                 <input
                   value={form.client}
-                  onChange={e => set("client", e.target.value)}
+                  onChange={(e) => set("client", e.target.value)}
                   placeholder={ar ? "اسم العميل" : "Client name"}
                   title={ar ? "العميل" : "Client"}
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "السنة" : "Year"}</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "السنة" : "Year"}
+                </label>
                 <input
                   value={form.year}
-                  onChange={e => set("year", e.target.value)}
+                  onChange={(e) => set("year", e.target.value)}
                   inputMode="numeric"
                   placeholder="2026"
                   title={ar ? "السنة" : "Year"}
@@ -318,36 +386,56 @@ function PortfolioModal({
             {/* Scope of work */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "نطاق العمل بالعربي" : "Scope (Arabic)"}</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "نطاق العمل بالعربي" : "Scope (Arabic)"}
+                </label>
                 <input
                   value={form.scope_ar}
-                  onChange={e => set("scope_ar", e.target.value)}
+                  onChange={(e) => set("scope_ar", e.target.value)}
                   dir="rtl"
                   placeholder="تصميم هوية, إنتاج متكامل"
-                  title={ar ? "نطاق العمل بالعربي (افصل بينها بفواصل)" : "Scope tags, comma separated"}
+                  title={
+                    ar
+                      ? "نطاق العمل بالعربي (افصل بينها بفواصل)"
+                      : "Scope tags, comma separated"
+                  }
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
-                <p className="text-xs text-(--muted-foreground)">{ar ? "افصل بين الوسوم بفاصلة" : "Comma separated"}</p>
+                <p className="text-xs text-(--muted-foreground)">
+                  {ar ? "افصل بين الوسوم بفاصلة" : "Comma separated"}
+                </p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-(--foreground)">{ar ? "نطاق العمل بالإنجليزي" : "Scope (English)"}</label>
+                <label className="text-sm font-medium text-(--foreground)">
+                  {ar ? "نطاق العمل بالإنجليزي" : "Scope (English)"}
+                </label>
                 <input
                   value={form.scope_en}
-                  onChange={e => set("scope_en", e.target.value)}
+                  onChange={(e) => set("scope_en", e.target.value)}
                   dir="ltr"
                   placeholder="Identity Craft, Production"
-                  title={ar ? "نطاق العمل بالإنجليزي (افصل بينها بفواصل)" : "Scope tags, comma separated"}
+                  title={
+                    ar
+                      ? "نطاق العمل بالإنجليزي (افصل بينها بفواصل)"
+                      : "Scope tags, comma separated"
+                  }
                   className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
-                <p className="text-xs text-(--muted-foreground)">{ar ? "افصل بين الوسوم بفاصلة" : "Comma separated"}</p>
+                <p className="text-xs text-(--muted-foreground)">
+                  {ar ? "افصل بين الوسوم بفاصلة" : "Comma separated"}
+                </p>
               </div>
             </div>
 
             {/* Featured toggle */}
             <div className="flex items-center justify-between p-3 rounded-xl bg-(--muted)/50 border border-(--border)">
               <div>
-                <p className="text-sm font-medium text-(--foreground)">{ar ? "عمل مميز" : "Featured Item"}</p>
-                <p className="text-xs text-(--muted-foreground)">{ar ? "يظهر في الصفحة الرئيسية" : "Shown on homepage"}</p>
+                <p className="text-sm font-medium text-(--foreground)">
+                  {ar ? "عمل مميز" : "Featured Item"}
+                </p>
+                <p className="text-xs text-(--muted-foreground)">
+                  {ar ? "يظهر في الصفحة الرئيسية" : "Shown on homepage"}
+                </p>
               </div>
               <button
                 type="button"
@@ -357,14 +445,20 @@ function PortfolioModal({
                 onClick={() => set("is_featured", !form.is_featured)}
                 className={`w-10 h-6 rounded-full transition-colors relative shrink-0 ${form.is_featured ? "bg-(--primary)" : "bg-(--muted)"}`}
               >
-                <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-200 ${form.is_featured ? "inset-s-5" : "inset-s-1"}`} />
+                <span
+                  className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-200 ${form.is_featured ? "inset-s-5" : "inset-s-1"}`}
+                />
               </button>
             </div>
           </div>
 
           {/* Footer */}
           <div className="px-6 pb-6 flex gap-3 justify-end border-t border-(--border) pt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-sm text-(--muted-foreground) hover:bg-(--muted) transition-colors">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-sm text-(--muted-foreground) hover:bg-(--muted) transition-colors"
+            >
               {ar ? "إلغاء" : "Cancel"}
             </button>
             <button
@@ -372,7 +466,15 @@ function PortfolioModal({
               disabled={isSaving}
               className="px-5 py-2 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              {isSaving ? "..." : isEdit ? (ar ? "حفظ التعديلات" : "Save Changes") : (ar ? "إضافة العمل" : "Add Item")}
+              {isSaving
+                ? "..."
+                : isEdit
+                  ? ar
+                    ? "حفظ التعديلات"
+                    : "Save Changes"
+                  : ar
+                    ? "إضافة العمل"
+                    : "Add Item"}
             </button>
           </div>
         </form>
@@ -382,30 +484,64 @@ function PortfolioModal({
 }
 
 // ── Delete confirm ─────────────────────────────────────────────────────────
-function DeleteConfirm({ item, language, onClose, onConfirm, isDeleting }: {
-  item: PortfolioItem; language: string; onClose: () => void;
-  onConfirm: () => void; isDeleting: boolean;
+function DeleteConfirm({
+  item,
+  language,
+  onClose,
+  onConfirm,
+  isDeleting,
+}: {
+  item: PortfolioItem;
+  language: string;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
 }) {
   const ar = language === "ar";
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div className="w-full max-sm rounded-2xl bg-(--card) border border-(--border) shadow-xl p-6 space-y-4">
         <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center mx-auto">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-red-500"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" />
           </svg>
         </div>
         <div className="text-center">
-          <h3 className="font-semibold text-(--foreground)">{ar ? "حذف العمل" : "Delete Item"}</h3>
+          <h3 className="font-semibold text-(--foreground)">
+            {ar ? "حذف العمل" : "Delete Item"}
+          </h3>
           <p className="text-sm text-(--muted-foreground) mt-1">
-            {ar ? `هل تريد حذف "${item.title_ar}"؟` : `Delete "${item.title_en}"?`}
+            {ar
+              ? `هل تريد حذف "${item.title_ar}"؟`
+              : `Delete "${item.title_en}"?`}
           </p>
         </div>
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2 rounded-xl text-sm text-(--muted-foreground) hover:bg-(--muted) transition-colors">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2 rounded-xl text-sm text-(--muted-foreground) hover:bg-(--muted) transition-colors"
+          >
             {ar ? "إلغاء" : "Cancel"}
           </button>
-          <button onClick={onConfirm} disabled={isDeleting} className="flex-1 py-2 rounded-xl text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50">
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="flex-1 py-2 rounded-xl text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50"
+          >
             {isDeleting ? "..." : ar ? "حذف" : "Delete"}
           </button>
         </div>
@@ -420,30 +556,64 @@ const PortfolioManager = () => {
   const ar = language === "ar";
 
   const { data: items = [], isLoading, isError } = usePortfolio();
-  const { mutate: createItem,  isPending: isCreating } = useCreatePortfolio();
-  const { mutate: updateItem,  isPending: isUpdating } = useUpdatePortfolio();
-  const { mutate: deleteItem,  isPending: isDeleting } = useDeletePortfolio();
+  const { mutate: createItem, isPending: isCreating } = useCreatePortfolio();
+  const { mutate: updateItem, isPending: isUpdating } = useUpdatePortfolio();
+  const { mutate: deleteItem, isPending: isDeleting } = useDeletePortfolio();
 
-  const [showAdd,    setShowAdd]    = useState(false);
-  const [editItem,   setEditItem]   = useState<PortfolioItem | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editItem, setEditItem] = useState<PortfolioItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PortfolioItem | null>(null);
-  const [filter,     setFilter]     = useState<"all" | "featured">("all");
+  const [filter, setFilter] = useState<"all" | "featured">("all");
 
   // حالتا الـ State الخاصتان بمعاينة تفاصيل العمل الفاخرة
   const [previewItem, setPreviewItem] = useState<any>(null);
   const [currentImgIndex, setCurrentImgIndex] = useState<number>(0);
 
-  const filtered = filter === "featured" ? items.filter(i => i.is_featured) : items;
+  const filtered =
+    filter === "featured" ? items.filter((i) => i.is_featured) : items;
 
   const handleSave = (data: typeof EMPTY_FORM) => {
+    // 1. استخراج وتجهيز روابط الصور الإضافية من الفورم
+    let galleryUrls: string[] = [];
+    if (data.gallery) {
+      if (Array.isArray(data.gallery)) {
+        galleryUrls = data.gallery.filter(Boolean);
+      } else if (typeof data.gallery === "string") {
+        galleryUrls = data.gallery
+          .split(",")
+          .map((url: string) => url.trim())
+          .filter(Boolean);
+      }
+    }
+
+    // 2. تنظيف الروابط الإضافية والتأكد من عدم احتوائها على رابط الصورة الرئيسية (image_url)
+    const cleanExtraImages = galleryUrls.filter(
+      (url) => url !== data.image_url && url.trim() !== "",
+    );
+
+    // 3. بناء الـ Payload النهائي المرسل لـ Supabase
     const payload = {
       ...data,
-      category_id: data.category_id || undefined,
+      // حفظ الصور الإضافية فقط في عمود gallery كنص مفصول بفواصل (أو كمصفوفة إذا كنتِ تفضلين)
+      gallery: cleanExtraImages.join(", "),
+
+      // تجنب إرسال قيمة نصية عادية في حقل category_id لئلا يسبب خطأ الـ UUID
+      category_id:
+        data.category_id && data.category_id.includes("-")
+          ? data.category_id
+          : undefined,
+
+      // معالجة الوسوم (Tags) بطريقتكِ المعتادة
       scope_ar: toTags(data.scope_ar),
       scope_en: toTags(data.scope_en),
     };
+
+    // 4. إرسال الطلب لـ Supabase
     if (editItem) {
-      updateItem({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
+      updateItem(
+        { id: editItem.id, ...payload },
+        { onSuccess: () => setEditItem(null) },
+      );
     } else {
       createItem(payload, { onSuccess: () => setShowAdd(false) });
     }
@@ -453,24 +623,37 @@ const PortfolioManager = () => {
   const handleOpenPreview = (item: PortfolioItem) => {
     const it = item as any;
     const description = ar ? it.description_ar : it.description_en;
-    
+
     // 1. تحويل نطاق العمل لمصفوفة
     const rawScope = ar ? it.scope_ar : it.scope_en;
-    const scope = rawScope 
-      ? (Array.isArray(rawScope) ? rawScope : rawScope.split(',').map((s: string) => s.trim()).filter(Boolean))
+    const scope = rawScope
+      ? Array.isArray(rawScope)
+        ? rawScope
+        : rawScope
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean)
       : [];
 
     // 2. تحويل الصور المتعددة (الجاليري) لمصفوفة روابط
     const rawGallery = it.gallery || it.images;
-    let gallery: string[] = [];
+    let galleryArray: string[] = [];
     if (rawGallery) {
-      gallery = Array.isArray(rawGallery) 
-        ? rawGallery 
-        : rawGallery.split(',').map((s: string) => s.trim()).filter(Boolean);
+      galleryArray = Array.isArray(rawGallery)
+        ? rawGallery
+        : rawGallery
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean);
     }
-    // إذا لم يكن هناك جاليري، نضع الصورة الأساسية كأول صورة في المصفوفة
-    if (gallery.length === 0 && item.image_url) {
-      gallery.push(item.image_url);
+
+    // ✅ الحل السحري المدمج:
+    // نضع الصورة الرئيسية (image_url) دائماً كأول عنصر في السلايدر لتطابق صفحة الـ View تماماً
+    if (item.image_url) {
+      galleryArray = [
+        item.image_url,
+        ...galleryArray.filter((url) => url !== item.image_url),
+      ];
     }
 
     const formattedItem = {
@@ -479,13 +662,13 @@ const PortfolioManager = () => {
       description:
         description && description.trim().length > 0
           ? description
-          : (ar
-              ? "لم يتم إضافة تفاصيل عن المشروع بعد."
-              : "No project details have been added yet."),
+          : ar
+            ? "لم يتم إضافة تفاصيل عن المشروع بعد."
+            : "No project details have been added yet.",
       client: it.client || "—",
       year: it.year || "—",
       scope,
-      gallery, // مصفوفة الصور الجاهزة للعرض
+      gallery: galleryArray, // المصفوفة المرتبة والمدمجة بشكل صحيح
       image_url: item.image_url,
     };
     setPreviewItem(formattedItem);
@@ -495,22 +678,27 @@ const PortfolioManager = () => {
   const handlePrevImg = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!previewItem || !previewItem.gallery) return;
-    setCurrentImgIndex((prev) => (prev === 0 ? previewItem.gallery.length - 1 : prev - 1));
+    setCurrentImgIndex((prev) =>
+      prev === 0 ? previewItem.gallery.length - 1 : prev - 1,
+    );
   };
 
   const handleNextImg = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!previewItem || !previewItem.gallery) return;
-    setCurrentImgIndex((prev) => (prev === previewItem.gallery.length - 1 ? 0 : prev + 1));
+    setCurrentImgIndex((prev) =>
+      prev === previewItem.gallery.length - 1 ? 0 : prev + 1,
+    );
   };
 
   return (
     <div className="max-w-5xl mx-auto space-y-5">
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-(--foreground)">{ar ? "إدارة الأعمال" : "Portfolio Manager"}</h1>
+          <h1 className="text-xl font-bold text-(--foreground)">
+            {ar ? "إدارة الأعمال" : "Portfolio Manager"}
+          </h1>
           <p className="text-sm text-(--muted-foreground) mt-0.5">
             {ar ? `${items.length} عمل` : `${items.length} items`}
           </p>
@@ -519,8 +707,18 @@ const PortfolioManager = () => {
           onClick={() => setShowAdd(true)}
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 transition-opacity"
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
           {ar ? "إضافة عمل" : "Add Item"}
         </button>
@@ -529,9 +727,9 @@ const PortfolioManager = () => {
       {/* Filter tabs */}
       <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
         {[
-          { key: "all",      ar: "الكل",     en: "All"      },
-          { key: "featured", ar: "المميزة",  en: "Featured" },
-        ].map(tab => (
+          { key: "all", ar: "الكل", en: "All" },
+          { key: "featured", ar: "المميزة", en: "Featured" },
+        ].map((tab) => (
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key as "all" | "featured")}
@@ -550,7 +748,10 @@ const PortfolioManager = () => {
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-square rounded-2xl bg-(--muted) animate-pulse" />
+            <div
+              key={i}
+              className="aspect-square rounded-2xl bg-(--muted) animate-pulse"
+            />
           ))}
         </div>
       ) : isError ? (
@@ -559,14 +760,19 @@ const PortfolioManager = () => {
         </p>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 space-y-3">
-          <p className="text-(--muted-foreground)">{ar ? "لا توجد أعمال بعد" : "No items yet"}</p>
-          <button onClick={() => setShowAdd(true)} className="text-sm text-(--primary) hover:underline">
+          <p className="text-(--muted-foreground)">
+            {ar ? "لا توجد أعمال بعد" : "No items yet"}
+          </p>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="text-sm text-(--primary) hover:underline"
+          >
             {ar ? "أضف أول عمل" : "Add your first item"}
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map(item => (
+          {filtered.map((item) => (
             <div
               key={item.id}
               onClick={() => handleOpenPreview(item)} // فتح تفاصيل العرض الفاخرة عند النقر على كرت العمل
@@ -581,8 +787,20 @@ const PortfolioManager = () => {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-(--muted)">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-(--muted-foreground)">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-(--muted-foreground)"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
                   </svg>
                 </div>
               )}
@@ -605,9 +823,18 @@ const PortfolioManager = () => {
                     aria-label={ar ? "تعديل" : "Edit"}
                     className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   </button>
                   <button
@@ -618,8 +845,18 @@ const PortfolioManager = () => {
                     aria-label={ar ? "حذف" : "Delete"}
                     className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-500/80 hover:bg-red-500 flex items-center justify-center text-white transition-colors"
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" />
                     </svg>
                   </button>
                 </div>
@@ -637,7 +874,10 @@ const PortfolioManager = () => {
         <PortfolioModal
           initial={editItem ?? undefined}
           language={language}
-          onClose={() => { setShowAdd(false); setEditItem(null); }}
+          onClose={() => {
+            setShowAdd(false);
+            setEditItem(null);
+          }}
           onSave={handleSave}
           isSaving={isCreating || isUpdating}
         />
@@ -648,7 +888,11 @@ const PortfolioManager = () => {
           item={deleteTarget}
           language={language}
           onClose={() => setDeleteTarget(null)}
-          onConfirm={() => deleteItem(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })}
+          onConfirm={() =>
+            deleteItem(deleteTarget.id, {
+              onSuccess: () => setDeleteTarget(null),
+            })
+          }
           isDeleting={isDeleting}
         />
       )}
@@ -678,14 +922,17 @@ const PortfolioManager = () => {
 
             {/* الجزء الأيسر: سلايدر معرض الصور المصغر و الـ Thumbnails */}
             <div className="md:col-span-7 bg-zinc-950 flex flex-col justify-between relative p-4 group/slider">
-              <div className="relative flex-1 flex items-center justify-center aspect-16/10 md:aspect-auto overflow-hidden rounded-2xl bg-zinc-900">
+              {/* ✅ تعديل: تثبيت طول الحاوية لمنع اهتزاز الـ Modal */}
+              <div className="relative w-full h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden rounded-2xl bg-zinc-900">
                 <img
                   src={
-                    (previewItem.gallery && previewItem.gallery[currentImgIndex]) ||
+                    (previewItem.gallery &&
+                      previewItem.gallery[currentImgIndex]) ||
                     previewItem.image_url
                   }
                   alt={previewItem.title}
-                  className="max-w-full max-h-[50vh] md:max-h-[55vh] object-contain transition-all duration-500"
+                  // ✅ تعديل: جعل الصورة تتكيف دائماً داخل الصندوق الثابت بدون تغيير أبعاده
+                  className="max-w-full max-h-full object-contain transition-all duration-500"
                 />
 
                 {previewItem.gallery?.length > 1 && (
@@ -709,7 +956,6 @@ const PortfolioManager = () => {
                   </>
                 )}
               </div>
-
               {/* معرض الصور المصغرة */}
               {previewItem.gallery && previewItem.gallery.length > 0 && (
                 <div className="flex items-center gap-3 mt-4 overflow-x-auto pb-1 justify-center max-w-full scrollbar-thin scrollbar-thumb-zinc-800">
@@ -775,21 +1021,17 @@ const PortfolioManager = () => {
                   <div>
                     <div className="flex items-center gap-1.5 text-zinc-500 text-[11px] font-bold uppercase tracking-wider mb-3">
                       <Layers className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>
-                        {ar ? "نطاق العمل" : "SCOPE OF WORK"}
-                      </span>
+                      <span>{ar ? "نطاق العمل" : "SCOPE OF WORK"}</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {previewItem.scope.map(
-                        (tag: string, index: number) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1.5 text-xs font-medium rounded-full bg-zinc-950 text-zinc-300 border border-zinc-800/80 hover:border-emerald-500/30 transition-colors"
-                          >
-                            {tag}
-                          </span>
-                        ),
-                      )}
+                      {previewItem.scope.map((tag: string, index: number) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1.5 text-xs font-medium rounded-full bg-zinc-950 text-zinc-300 border border-zinc-800/80 hover:border-emerald-500/30 transition-colors"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -803,3 +1045,4 @@ const PortfolioManager = () => {
 };
 
 export default PortfolioManager;
+// handleSave

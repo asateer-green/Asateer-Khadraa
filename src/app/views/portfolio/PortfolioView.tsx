@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useLanguageContext } from "../../providers/LanguageProvider";
 import { ROUTES } from "../../config/routes";
-import { usePortfolio } from "../../../hooks/api/usePortfolio"; 
+import { usePortfolio } from "../../../hooks/api/usePortfolio";
 import { useSignage } from "../../../hooks/api/useSignage"; // استيراد الـ Hook الخاص باللوحات
 
 // استيراد صور معرض الأعمال الفاخرة من مجلد الـ assets
@@ -49,7 +49,7 @@ import Booth7 from "../../../assets/images/Booth/Booth7.jpeg";
 import Booth8 from "../../../assets/images/Booth/Booth8.jpeg";
 import Booth9 from "../../../assets/images/Booth/Booth9.jpeg";
 
-import { LogoDesignsSection } from "../Logos/LogoDesignsSection"; 
+import { LogoDesignsSection } from "../Logos/LogoDesignsSection";
 
 const mainImages = [
   pIdentity,
@@ -66,7 +66,7 @@ const mainImages = [
 
 export function PortfolioView() {
   const { t, language } = useLanguageContext();
-  
+
   // استدعاء بيانات المشاريع واللوحات الإعلانية من قاعدة البيانات
   const { data: dbProjects, isLoading: isPortfolioLoading } = usePortfolio();
   const { data: dbSignage, isLoading: isSignageLoading } = useSignage(); // جلب اللوحات
@@ -94,100 +94,216 @@ export function PortfolioView() {
     {
       title: language === "ar" ? "هوية شركة سدير" : "Sudair Brand Identity",
       category: language === "ar" ? "الهويات البصرية" : "Brand Identity",
-      description: language === "ar" ? "نظام هوية بصرية متكامل يغطي القوائم، التغليف، والمطبوعات الداخلية للمطعم بأسلوب عصري وواثق." : "A complete visual system covering menus, packaging and in-restaurant collateral with a confident, contemporary tone.",
+      description:
+        language === "ar"
+          ? "نظام هوية بصرية متكامل يغطي القوائم، التغليف، والمطبوعات الداخلية للمطعم بأسلوب عصري وواثق."
+          : "A complete visual system covering menus, packaging and in-restaurant collateral with a confident, contemporary tone.",
       client: language === "ar" ? "مجموعة سدير الفاخرة" : "Sudair Fine Dining",
       year: "2025",
-      scope: language === "ar" ? ["إستراتيجية الهوية", "تصميم القوائم", "التغليف", "التوجيه المكاني"] : ["Brand strategy", "Menu design", "Packaging", "Wayfinding"],
+      scope:
+        language === "ar"
+          ? ["إستراتيجية الهوية", "تصميم القوائم", "التغليف", "التوجيه المكاني"]
+          : ["Brand strategy", "Menu design", "Packaging", "Wayfinding"],
       gallery: [pIdentity, pLogos, pManufacturing],
     },
     {
       title: language === "ar" ? "شعار تميز الإبداع" : "Tamayoz Logo Craft",
       category: language === "ar" ? "الشعارات" : "Logos",
-      description: language === "ar" ? "تصميم شعار فريد يعبر عن الابتكار والتميز في بيئة العمل الرقمية الحديثة." : "Unique logo design reflecting innovation and excellence in modern digital workspaces.",
+      description:
+        language === "ar"
+          ? "تصميم شعار فريد يعبر عن الابتكار والتميز في بيئة العمل الرقمية الحديثة."
+          : "Unique logo design reflecting innovation and excellence in modern digital workspaces.",
       client: language === "ar" ? "شركة تميز" : "Tamayoz Co.",
       year: "2024",
-      scope: language === "ar" ? ["تصميم الشعار", "الأدلة الإرشادية"] : ["Logo Design", "Brand Guidelines"],
+      scope:
+        language === "ar"
+          ? ["تصميم الشعار", "الأدلة الإرشادية"]
+          : ["Logo Design", "Brand Guidelines"],
       gallery: [pLogos, pIdentity],
     },
     {
-      title: language === "ar" ? "لوحات فندق هيلتون الداخلي" : "Hilton Indoor Signage",
-      category: language === "ar" ? "التصنيع واللوحات" : "Signage & Manufacturing",
-      description: language === "ar" ? "تصنيع وتركيب اللوحات الإرشادية والداخلية المضيئة بجودة وتفاصيل هندسية فاخرة تتماشى مع معايير الفندق." : "Manufacturing and installation of indoor illuminated signs with premium engineering detail standard to hotel compliance.",
+      title:
+        language === "ar"
+          ? "لوحات فندق هيلتون الداخلي"
+          : "Hilton Indoor Signage",
+      category:
+        language === "ar" ? "التصنيع واللوحات" : "Signage & Manufacturing",
+      description:
+        language === "ar"
+          ? "تصنيع وتركيب اللوحات الإرشادية والداخلية المضيئة بجودة وتفاصيل هندسية فاخرة تتماشى مع معايير الفندق."
+          : "Manufacturing and installation of indoor illuminated signs with premium engineering detail standard to hotel compliance.",
       client: language === "ar" ? "فندق هيلتون" : "Hilton Hotel",
       year: "2026",
-      scope: language === "ar" ? ["اللوحات الإرشادية", "التصنيع الهيكلي"] : ["Wayfinding Signage", "Structural Fabrication"],
+      scope:
+        language === "ar"
+          ? ["اللوحات الإرشادية", "التصنيع الهيكلي"]
+          : ["Wayfinding Signage", "Structural Fabrication"],
       gallery: [pManufacturing, pBillboard],
     },
     {
-      title: language === "ar" ? "يونيبول طريق الملك فهد" : "King Fahd Road Unipole",
+      title:
+        language === "ar" ? "يونيبول طريق الملك فهد" : "King Fahd Road Unipole",
       category: language === "ar" ? "لوحات إعلانية" : "Billboards",
-      description: language === "ar" ? "تطوير وتنفيذ لوحة يونيبول عملاقة على أحد أهم الطرق الحيوية لضمان أعلى نسبة مشاهدة وانطباع." : "Development and execution of a massive unipole billboard on a vital highway for maximum reach and high-impact impression.",
-      client: language === "ar" ? "وكالة الأبعاد الإعلانية" : "Dimensions Agency",
+      description:
+        language === "ar"
+          ? "تطوير وتنفيذ لوحة يونيبول عملاقة على أحد أهم الطرق الحيوية لضمان أعلى نسبة مشاهدة وانطباع."
+          : "Development and execution of a massive unipole billboard on a vital highway for maximum reach and high-impact impression.",
+      client:
+        language === "ar" ? "وكالة الأبعاد الإعلانية" : "Dimensions Agency",
       year: "2025",
-      scope: language === "ar" ? ["تصميم الإعلانات خارجي", "تنسيق المواقع"] : ["Outdoor Ad Design", "Site Coordination"],
+      scope:
+        language === "ar"
+          ? ["تصميم الإعلانات خارجي", "تنسيق المواقع"]
+          : ["Outdoor Ad Design", "Site Coordination"],
       gallery: [Unipole1, Unipole2, Unipole3, Unipole4, Unipole5],
     },
     {
-      title: language === "ar" ? "بوث وزارة الاستثمار - سيتي سكيب" : "MISA Exhibition Booth",
+      title:
+        language === "ar"
+          ? "بوث وزارة الاستثمار - سيتي سكيب"
+          : "MISA Exhibition Booth",
       category: language === "ar" ? "تجهيز المعارض" : "Exhibition Booths",
-      description: language === "ar" ? "تصميم وتجهيز جناح متكامل لوزارة الاستثمار في معرض سيتي سكيب العالمي بهيكل مستدام وحلول تقنية مدمجة." : "Design and build of an integrated pavilion for MISA at Cityscape Global, utilizing sustainable structure and smart tech options.",
+      description:
+        language === "ar"
+          ? "تصميم وتجهيز جناح متكامل لوزارة الاستثمار في معرض سيتي سكيب العالمي بهيكل مستدام وحلول تقنية مدمجة."
+          : "Design and build of an integrated pavilion for MISA at Cityscape Global, utilizing sustainable structure and smart tech options.",
       client: language === "ar" ? "وزارة الاستثمار" : "Ministry of Investment",
       year: "2024",
-      scope: language === "ar" ? ["التصميم المعماري للجناح", "الإشراف والتنفيذ"] : ["Booth Architecture", "Execution & Styling"],
-      gallery: [Booth1, Booth2, Booth3, Booth4, Booth5, Booth6, Booth7, Booth8, Booth9],
+      scope:
+        language === "ar"
+          ? ["التصميم المعماري للجناح", "الإشراف والتنفيذ"]
+          : ["Booth Architecture", "Execution & Styling"],
+      gallery: [
+        Booth1,
+        Booth2,
+        Booth3,
+        Booth4,
+        Booth5,
+        Booth6,
+        Booth7,
+        Booth8,
+        Booth9,
+      ],
     },
     {
-      title: language === "ar" ? "جلسة تصوير منتجات المراعي" : "Almarai Product Photoshoot",
+      title:
+        language === "ar"
+          ? "جلسة تصوير منتجات المراعي"
+          : "Almarai Product Photoshoot",
       category: language === "ar" ? "التوير الاحترافي" : "Photography",
-      description: language === "ar" ? "إنتاج وإخراج جلسة تصوير تجارية لمنتجات شركة المراعي الجديدة لاستخدامها في الحملات الرقمية والمطبوعة." : "Production and direction of a commercial product photoshoot for Almarai's new range, optimized for digital and print campaigns.",
+      description:
+        language === "ar"
+          ? "إنتاج وإخراج جلسة تصوير تجارية لمنتجات شركة المراعي الجديدة لاستخدامها في الحملات الرقمية والمطبوعة."
+          : "Production and direction of a commercial product photoshoot for Almarai's new range, optimized for digital and print campaigns.",
       client: language === "ar" ? "شركة المراعي" : "Almarai Company",
       year: "2026",
-      scope: language === "ar" ? ["التصوير التجاري", "تنسيق الأطعمة", "المعالجة الرقمية"] : ["Commercial Art", "Food Styling", "Retouching"],
+      scope:
+        language === "ar"
+          ? ["التصوير التجاري", "تنسيق الأطعمة", "المعالجة الرقمية"]
+          : ["Commercial Art", "Food Styling", "Retouching"],
       gallery: [pPhoto, pMotion],
     },
     {
-      title: language === "ar" ? "فيديو موشن جرافيك لمنصة بلدي" : "Balady Platform Motion Video",
+      title:
+        language === "ar"
+          ? "فيديو موشن جرافيك لمنصة بلدي"
+          : "Balady Platform Motion Video",
       category: language === "ar" ? "الموشن جرافيك" : "Motion Graphics",
-      description: language === "ar" ? "فيديو موشن جرافيك توعوي يشرح التحديثات والخدمات الرقمية الجديدة لمنصة بلدي بشكل مبسط وجذاب." : "An explainer motion graphics video detailing the new digital workflow and features of Balady platform in a smooth approach.",
+      description:
+        language === "ar"
+          ? "فيديو موشن جرافيك توعوي يشرح التحديثات والخدمات الرقمية الجديدة لمنصة بلدي بشكل مبسط وجذاب."
+          : "An explainer motion graphics video detailing the new digital workflow and features of Balady platform in a smooth approach.",
       client: language === "ar" ? "الأمانة العامة" : "Balady Municipality",
       year: "2025",
-      scope: language === "ar" ? ["كتابة السيناريو", "الرسم والتحريك", "الأداء الصوتي"] : ["Scriptwriting", "Storyboarding & Motion", "Voiceover"],
+      scope:
+        language === "ar"
+          ? ["كتابة السيناريو", "الرسم والتحريك", "الأداء الصوتي"]
+          : ["Scriptwriting", "Storyboarding & Motion", "Voiceover"],
       gallery: [pMotion, pPhoto],
     },
     {
-      title: language === "ar" ? "مطبوعات وعلب عطور الماجد" : "Almajed Oud Premium Packaging",
+      title:
+        language === "ar"
+          ? "مطبوعات وعلب عطور الماجد"
+          : "Almajed Oud Premium Packaging",
       category: language === "ar" ? "الطباعة الفاخرة" : "Premium Printing",
-      description: language === "ar" ? "تصميم وتنفيذ علب عطور الماجد الفاخرة مع استخدام تقنيات الحفر والورق الحراري الذهبي والمخمل لإعطاء طابع ملكي." : "Design and execution of premium perfume packaging for Almajed Oud with hot foil stamping and textured velvet layers.",
+      description:
+        language === "ar"
+          ? "تصميم وتنفيذ علب عطور الماجد الفاخرة مع استخدام تقنيات الحفر والورق الحراري الذهبي والمخمل لإعطاء طابع ملكي."
+          : "Design and execution of premium perfume packaging for Almajed Oud with hot foil stamping and textured velvet layers.",
       client: language === "ar" ? "الماجد للعود" : "Almajed Oud",
       year: "2026",
-      scope: language === "ar" ? ["تصميم العبوات والتغليف", "اختيار المواد الفاخرة"] : ["Structural Box Design", "Material Sourcing"],
+      scope:
+        language === "ar"
+          ? ["تصميم العبوات والتغليف", "اختيار المواد الفاخرة"]
+          : ["Structural Box Design", "Material Sourcing"],
       gallery: [pPrinting, pIdentity],
     },
     {
-      title: language === "ar" ? "لوحات الحروف البارزة " : "Prominent Letter Boards",
+      title:
+        language === "ar" ? "لوحات الحروف البارزة " : "Prominent Letter Boards",
       category: language === "ar" ? "اللوحات الإعلانية" : "Advertising Boards",
-      description: language === "ar" ? "لوحات حروف بارزة مصممة خصيصاً لتعزيز الحضور والانطباع عند الزوار." : "Prominent letter boards designed to create a strong presence and impression on visitors.",
+      description:
+        language === "ar"
+          ? "لوحات حروف بارزة مصممة خصيصاً لتعزيز الحضور والانطباع عند الزوار."
+          : "Prominent letter boards designed to create a strong presence and impression on visitors.",
       client: language === "ar" ? "شركة التسويق" : "Marketing Company",
       year: "2024",
-      scope: language === "ar" ? ["تصميم اللوحات", "التنفيذ"] : ["Board Design", "Execution"],
+      scope:
+        language === "ar"
+          ? ["تصميم اللوحات", "التنفيذ"]
+          : ["Board Design", "Execution"],
       gallery: [boards1, boards2, boards3, boards4, boards5, boards6],
     },
   ];
 
- // 3. هيكلة المشاريع القادمة من قاعدة البيانات ديناميكياً
+  // 3. هيكلة المشاريع القادمة من قاعدة البيانات ديناميكياً
   const dynamicProjects = dbProjects
-    ? dbProjects.map((p: any) => ({
+    ? dbProjects.map((p: any) => {
+        // تحويل نص الـ gallery المخزن في قاعدة البيانات كروابط مفصولة بفواصل إلى مصفوفة نصوص
+        let galleryArray: string[] = [];
+        if (p.gallery) {
+          if (Array.isArray(p.gallery)) {
+            galleryArray = p.gallery.filter(Boolean);
+          } else if (typeof p.gallery === "string") {
+            galleryArray = p.gallery
+              .split(",")
+              .map((url: string) => url.trim())
+              .filter(Boolean);
+          }
+        }
+
+        // ✅ الحل السحري: نضع الصورة الرئيسية (image_url) دائماً كأول عنصر في المصفوفة
+        // مع تجنب تكرارها إذا كانت مضافة مسبقاً في المعرض الإضافي
+        if (p.image_url) {
+          galleryArray = [
+            p.image_url,
+            ...galleryArray.filter((url) => url !== p.image_url),
+          ];
+        }
+
+        return {
           title: language === "ar" ? p.title_ar : p.title_en,
-          category: language === "ar" ? p.category_id : p.category_id, // أو اتركي التخصيص حسب الكود الحالي لديكِ
-          description: language === "ar" ? p.description_ar : p.description_en, // القراءة من الحقول الجديدة في الجدول
-          client: p.client || "—", // القراءة مباشرة من حقل client الجديد
+          category: language === "ar" ? p.category_id : p.category_id,
+          description: language === "ar" ? p.description_ar : p.description_en,
+          client: p.client || "—",
           year: p.year || "—",
-          scope: language === "ar" 
-            ? (p.scope_ar ? (Array.isArray(p.scope_ar) ? p.scope_ar : p.scope_ar.split(',').map((s: string) => s.trim())) : []) 
-            : (p.scope_en ? (Array.isArray(p.scope_en) ? p.scope_en : p.scope_en.split(',').map((s: string) => s.trim())) : []),
-          gallery: p.image_url ? [p.image_url] : [],
-          image_url: p.image_url
-        }))
+          scope:
+            language === "ar"
+              ? p.scope_ar
+                ? Array.isArray(p.scope_ar)
+                  ? p.scope_ar
+                  : p.scope_ar.split(",").map((s: string) => s.trim())
+                : []
+              : p.scope_en
+                ? Array.isArray(p.scope_en)
+                  ? p.scope_en
+                  : p.scope_en.split(",").map((s: string) => s.trim())
+                : [],
+          gallery: galleryArray, // مصفوفة مرتبة تبدأ بالصورة الرئيسية
+          image_url: p.image_url,
+        };
+      })
     : [];
 
   // 4. هيكلة اللوحات القادمة من قسم إدارة اللوحات ديناميكياً لتندمج مع المعرض
@@ -196,15 +312,20 @@ export function PortfolioView() {
         .filter((s: any) => s.is_active !== false) // عرض اللوحات النشطة فقط[cite: 8]
         .map((s: any) => ({
           title: language === "ar" ? s.title_ar : s.title_en, //[cite: 8]
-          category: language === "ar" ? "التصنيع واللوحات" : "Signage & Manufacturing", // تصنيفها المباشر
-          description: language === "ar" 
-            ? `لوحة مخصصة تم تصنيعها وتركيبها بدقة في موقع: ${s.location || 'غير محدد'}.` 
-            : `Custom signage manufactured and installed at: ${s.location || 'N/A'}.`,
+          category:
+            language === "ar" ? "التصنيع واللوحات" : "Signage & Manufacturing", // تصنيفها المباشر
+          description:
+            language === "ar"
+              ? `لوحة مخصصة تم تصنيعها وتركيبها بدقة في موقع: ${s.location || "غير محدد"}.`
+              : `Custom signage manufactured and installed at: ${s.location || "N/A"}.`,
           client: language === "ar" ? "طلب خاص" : "Custom Order",
           year: "2026",
-          scope: language === "ar" ? ["تصنيع هيكلي", "تركيب خارجي"] : ["Structural Fabrication", "Field Installation"],
+          scope:
+            language === "ar"
+              ? ["تصنيع هيكلي", "تركيب خارجي"]
+              : ["Structural Fabrication", "Field Installation"],
           gallery: [s.image_url], //[cite: 8]
-          image_url: s.image_url //[cite: 8]
+          image_url: s.image_url, //[cite: 8]
         }))
     : [];
 
@@ -212,25 +333,32 @@ export function PortfolioView() {
   const allDynamicItems = [...dynamicProjects, ...dynamicSignages];
 
   // إذا كانت المصفوفة المدمجة فارغة نعود للمصفوفة الاحتياطية الثابتة
-  const portfolioItems = allDynamicItems.length > 0 ? allDynamicItems : localFallbackItems;
+  const portfolioItems =
+    allDynamicItems.length > 0 ? allDynamicItems : localFallbackItems;
 
   const handlePrevImg = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!selectedProject || !selectedProject.gallery) return;
-    setCurrentImgIndex((prev) => (prev === 0 ? selectedProject.gallery.length - 1 : prev - 1));
+    setCurrentImgIndex((prev) =>
+      prev === 0 ? selectedProject.gallery.length - 1 : prev - 1,
+    );
   };
 
   const handleNextImg = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!selectedProject || !selectedProject.gallery) return;
-    setCurrentImgIndex((prev) => (prev === selectedProject.gallery.length - 1 ? 0 : prev + 1));
+    setCurrentImgIndex((prev) =>
+      prev === selectedProject.gallery.length - 1 ? 0 : prev + 1,
+    );
   };
 
   if (isPortfolioLoading || isSignageLoading) {
     return (
       <div className="w-full min-h-screen bg-(--color-background) flex items-center justify-center">
         <div className="text-zinc-500 font-medium">
-          {language === "ar" ? "جاري تحميل معرض الأعمال..." : "Loading portfolio..."}
+          {language === "ar"
+            ? "جاري تحميل معرض الأعمال..."
+            : "Loading portfolio..."}
         </div>
       </div>
     );
@@ -283,7 +411,8 @@ export function PortfolioView() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolioItems.map((item: any, i: number) => {
             const isWide = i === 0 || i === 5;
-            const projectImage = item.image_url || mainImages[i % mainImages.length];
+            const projectImage =
+              item.image_url || mainImages[i % mainImages.length];
 
             return (
               <figure
@@ -305,7 +434,8 @@ export function PortfolioView() {
                     loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = mainImages[i % mainImages.length];
+                      (e.target as HTMLImageElement).src =
+                        mainImages[i % mainImages.length];
                     }}
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-zinc-950/80 via-zinc-950/20 to-transparent opacity-90 transition-opacity group-hover:opacity-95" />
@@ -350,14 +480,17 @@ export function PortfolioView() {
 
             {/* الجزء الأيسر: Slider المعرض والـ Thumbnails */}
             <div className="md:col-span-7 bg-zinc-950 flex flex-col justify-between relative p-4 group/slider">
-              <div className="relative flex-1 flex items-center justify-center aspect-16/10 md:aspect-auto overflow-hidden rounded-2xl bg-zinc-900">
+              {/* ✅ تعديل: تثبيت طول الحاوية لمنع اهتزاز الـ Modal */}
+              <div className="relative w-full h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden rounded-2xl bg-zinc-900">
                 <img
                   src={
-                    (selectedProject.gallery && selectedProject.gallery[currentImgIndex]) ||
+                    (selectedProject.gallery &&
+                      selectedProject.gallery[currentImgIndex]) ||
                     selectedProject.image_url
                   }
                   alt={selectedProject.title}
-                  className="max-w-full max-h-[50vh] md:max-h-[55vh] object-contain transition-all duration-500"
+                  // ✅ تعديل: جعل الصورة تتكيف دائماً داخل الصندوق الثابت بدون تغيير أبعاده
+                  className="max-w-full max-h-full object-contain transition-all duration-500"
                 />
 
                 {selectedProject.gallery?.length > 1 && (
@@ -382,27 +515,28 @@ export function PortfolioView() {
                 )}
               </div>
 
-              {selectedProject.gallery && selectedProject.gallery.length > 1 && (
-                <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1 justify-center">
-                  {selectedProject.gallery.map((img: string, idx: number) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentImgIndex(idx)}
-                      className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                        currentImgIndex === idx
-                          ? "border-emerald-500 scale-105 shadow-md"
-                          : "border-transparent opacity-50 hover:opacity-100"
-                      }`}
-                    >
-                      <img
-                        src={img}
-                        alt="thumbnail"
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
+              {selectedProject.gallery &&
+                selectedProject.gallery.length > 1 && (
+                  <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1 justify-center">
+                    {selectedProject.gallery.map((img: string, idx: number) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImgIndex(idx)}
+                        className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                          currentImgIndex === idx
+                            ? "border-emerald-500 scale-105 shadow-md"
+                            : "border-transparent opacity-50 hover:opacity-100"
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt="thumbnail"
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
 
             {/* الجزء الأيمن: لوحة البيانات التفصيلية الداكنة */}
@@ -472,7 +606,7 @@ export function PortfolioView() {
           </div>
         </div>
       )}
-            {/* ── رابعاً: قسم معرض الشعارات ── */}
+      {/* ── رابعاً: قسم معرض الشعارات ── */}
       <section>
         <LogoDesignsSection />
       </section>
@@ -516,4 +650,3 @@ export function PortfolioView() {
 }
 
 export default PortfolioView;
-
