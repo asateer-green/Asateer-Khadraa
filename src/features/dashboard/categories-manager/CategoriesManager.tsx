@@ -1,6 +1,6 @@
 // src/features/dashboard/categories-manager/CategoriesManager.tsx
-import { useState, type FormEvent } from "react";
-import { Plus, Pencil, Trash2, ImageIcon } from "lucide-react";
+import { useState, useEffect, type FormEvent } from "react";
+import { Plus, Pencil, Trash2, ImageIcon, Upload } from "lucide-react"; // أضفنا أيقونة Upload
 import {
   useCategories,
   useCreateCategory,
@@ -14,7 +14,13 @@ import { Field, TextInput } from "../../../components/ui/FormField";
 import { SafeImage, EmptyState, ListSkeleton } from "../../../components/ui/SafeImage";
 import type { Category } from "../../../types/api.types";
 
-const EMPTY_FORM = { name_ar: "", name_en: "", image_url: "" };
+const EMPTY_FORM = { 
+  name_ar: "", 
+  name_en: "", 
+  uploadMode: "file" as "url" | "file", 
+  imageFile: null as File | null, 
+  image_url: "" 
+};
 type CategoryForm = typeof EMPTY_FORM;
 
 // ── Add / Edit modal ─────────────────────────────────────────────────────
@@ -31,16 +37,30 @@ function CategoryFormModal({
   onSave: (data: CategoryForm) => void;
   isSaving: boolean;
 }) {
-  const [form, setForm] = useState<CategoryForm>(
-    initial
-      ? { name_ar: initial.name_ar, name_en: initial.name_en, image_url: initial.image_url ?? "" }
-      : EMPTY_FORM,
-  );
-  const set = (key: keyof CategoryForm, value: string) => setForm(f => ({ ...f, [key]: value }));
+  const [form, setForm] = useState<CategoryForm>(EMPTY_FORM);
+
+  useEffect(() => {
+    if (initial) {
+      setForm({
+        name_ar: initial.name_ar,
+        name_en: initial.name_en,
+        uploadMode: "file", // الوضع الافتراضي عند التعديل هو اختيار ملف
+        imageFile: null,
+        image_url: initial.image_url ?? "",
+      });
+    } else {
+      setForm(EMPTY_FORM);
+    }
+  }, [initial]);
+
+  const set = <K extends keyof CategoryForm>(key: K, value: CategoryForm[K]) => 
+    setForm(f => ({ ...f, [key]: value }));
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!form.name_ar.trim() || !form.name_en.trim()) return;
+    if (form.uploadMode === "file" && !form.imageFile && !initial) return;
+    if (form.uploadMode === "url" && !form.image_url.trim()) return;
     onSave(form);
   };
 
@@ -93,22 +113,73 @@ function CategoryFormModal({
           </Field>
         </div>
 
-        <Field label={ar ? "رابط الصورة" : "Image URL"}>
-          <TextInput
-            value={form.image_url}
-            onChange={e => set("image_url", e.target.value)}
-            type="url"
-            placeholder="https://..."
-            title={ar ? "رابط الصورة" : "Image URL"}
+        {/* أزرار التبديل بين الرفع والرابط الخارجي */}
+        <Field label={ar ? "مصدر الصورة" : "Image Source"}>
+          <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
+            {(["url", "file"] as const).map(mode => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => set("uploadMode", mode)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  form.uploadMode === mode ? "bg-(--card) text-(--foreground) shadow-sm" : "text-(--muted-foreground) hover:text-(--foreground)"
+                }`}
+              >
+                {mode === "url" ? (ar ? "رابط خارجي" : "External URL") : (ar ? "رفع من الجهاز" : "Upload File")}
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        {/* حقل الإدخال المتغير بحسب اختيار المستخدم */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-(--foreground)">
+            {form.uploadMode === "url" ? (ar ? "رابط الصورة" : "Image URL") : (ar ? "ملف الصورة" : "Image File")}
+          </label>
+          
+          {form.uploadMode === "url" ? (
+            <TextInput
+              value={form.image_url}
+              onChange={e => set("image_url", e.target.value)}
+              type="url"
+              placeholder="https://..."
+              title={ar ? "رابط الصورة" : "Image URL"}
+            />
+          ) : (
+            <div className="relative border-2 border-dashed border-(--border) hover:border-(--primary)/50 rounded-xl px-4 py-3 flex items-center gap-2 cursor-pointer transition-colors">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => set("imageFile", e.target.files?.[0] ?? null)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                title="Choose image"
+              />
+              <Upload size={15} className="text-(--muted-foreground) shrink-0" />
+              <span className="text-sm text-(--muted-foreground) truncate">
+                {form.imageFile ? form.imageFile.name : (ar ? "اختر صورة للملف" : "Choose image file")}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* المعاينة الحية للصورة */}
+        {form.uploadMode === "url" && form.image_url && (
+          <SafeImage
+            src={form.image_url}
+            alt="preview"
+            className="mt-2 h-24 w-full object-cover rounded-xl border border-(--border)"
           />
-          {form.image_url && (
+        )}
+        {form.uploadMode === "file" && form.image_url && !form.imageFile && (
+          <div className="space-y-1">
+            <span className="text-xs text-(--muted-foreground)">{ar ? "الصورة الحالية:" : "Current Image:"}</span>
             <SafeImage
               src={form.image_url}
-              alt="preview"
-              className="mt-2 h-24 w-full object-cover rounded-xl border border-(--border)"
+              alt="current"
+              className="h-24 w-full object-cover rounded-xl border border-(--border)"
             />
-          )}
-        </Field>
+          </div>
+        )}
       </form>
     </Modal>
   );
@@ -130,11 +201,18 @@ const CategoriesManager = () => {
 
   const isSaving = isCreating || isUpdating;
 
-  const handleSave = (data: CategoryForm) => {
+  const handleSave = (form: CategoryForm) => {
+    const payload = {
+      name_ar: form.name_ar,
+      name_en: form.name_en,
+      imageFile: form.uploadMode === "file" ? form.imageFile : null,
+      image_url: form.uploadMode === "url" ? form.image_url : (!form.imageFile && editItem ? editItem.image_url : undefined),
+    };
+
     if (editItem) {
-      update({ id: editItem.id, ...data }, { onSuccess: () => setEditItem(null) });
+      update({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
     } else {
-      create(data, { onSuccess: () => setShowAdd(false) });
+      create(payload, { onSuccess: () => setShowAdd(false) });
     }
   };
 

@@ -15,10 +15,13 @@ const EMPTY_FORM = {
   title_en:   "",
   desc_ar:    "",
   desc_en:    "",
+  uploadMode: "file" as "url" | "file",
+  imageFile:  null as File | null,
   image_url:  "",
   is_active:  true,
   sort_order: 0,
 };
+type ServiceForm = typeof EMPTY_FORM;
 
 // ── Service Form Modal ─────────────────────────────────────────────────────
 function ServiceModal({
@@ -31,17 +34,19 @@ function ServiceModal({
   initial?: Service;
   language: string;
   onClose: () => void;
-  onSave: (data: typeof EMPTY_FORM) => void;
+  onSave: (data: ServiceForm) => void;
   isSaving: boolean;
 }) {
   const ar = language === "ar";
-  const [form, setForm] = useState(
+  const [form, setForm] = useState<ServiceForm>(
     initial
       ? {
           title_ar:  initial.title_ar,
           title_en:  initial.title_en,
           desc_ar:   initial.desc_ar  ?? "",
           desc_en:   initial.desc_en  ?? "",
+          uploadMode: "file",
+          imageFile: null,
           image_url: initial.image_url ?? "",
           is_active: initial.is_active,
           sort_order: initial.sort_order,
@@ -49,7 +54,7 @@ function ServiceModal({
       : EMPTY_FORM
   );
 
-  const set = (key: keyof typeof EMPTY_FORM, value: string | boolean | number) =>
+  const set = <K extends keyof ServiceForm>(key: K, value: ServiceForm[K]) =>
     setForm(f => ({ ...f, [key]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -140,27 +145,75 @@ function ServiceModal({
               />
             </div>
 
-            {/* Image URL */}
+            {/* Image Selector (مصدر صورة الخدمة) */}
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-(--foreground)">
-                {ar ? "رابط الصورة" : "Image URL"}
+                {ar ? "مصدر صورة الخدمة" : "Service Image Source"}
               </label>
-              <input
-                value={form.image_url}
-                onChange={e => set("image_url", e.target.value)}
-                type="url"
-                placeholder="https://..."
-                className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
-              />
-              {form.image_url && (
-                <img
-                  src={form.image_url}
-                  alt="preview"
-                  className="mt-2 h-24 w-full object-cover rounded-xl border border-(--border)"
-                  onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+              <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
+                {(["url", "file"] as const).map(mode => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => set("uploadMode", mode)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      form.uploadMode === mode ? "bg-(--card) text-(--foreground) shadow-sm" : "text-(--muted-foreground) hover:text-(--foreground)"
+                    }`}
+                  >
+                    {mode === "url" ? (ar ? "رابط خارجي" : "External URL") : (ar ? "رفع من الجهاز" : "Upload File")}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Input area based on choice */}
+            <div className="space-y-1.5">
+              {form.uploadMode === "url" ? (
+                <input
+                  value={form.image_url}
+                  onChange={e => set("image_url", e.target.value)}
+                  type="url"
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-(--input) border border-(--border) text-(--foreground) placeholder:text-(--muted-foreground) focus:outline-none focus:ring-2 focus:ring-(--ring)"
                 />
+              ) : (
+                <div className="relative border-2 border-dashed border-(--border) hover:border-(--primary)/50 rounded-xl px-4 py-3 flex items-center gap-2 cursor-pointer transition-colors">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={e => set("imageFile", e.target.files?.[0] ?? null)} 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                    title="service_file" 
+                  />
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-(--muted-foreground) shrink-0">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  <span className="text-sm text-(--muted-foreground) truncate">
+                    {form.imageFile ? form.imageFile.name : (ar ? "اختر صورة للخدمة" : "Choose image file")}
+                  </span>
+                </div>
               )}
             </div>
+
+            {/* Image Preview */}
+            {form.uploadMode === "url" && form.image_url && (
+              <img
+                src={form.image_url}
+                alt="preview"
+                className="mt-2 h-24 w-full object-cover rounded-xl border border-(--border)"
+                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
+            {form.uploadMode === "file" && form.image_url && !form.imageFile && (
+              <div className="space-y-1">
+                <span className="text-xs text-(--muted-foreground)">{ar ? "الصورة الحالية:" : "Current Image:"}</span>
+                <img
+                  src={form.image_url}
+                  alt="current"
+                  className="h-24 w-full object-cover rounded-xl border border-(--border)"
+                />
+              </div>
+            )}
 
             {/* Sort order + Active */}
             <div className="flex items-center gap-4">
@@ -274,14 +327,25 @@ const ServicesManager = () => {
   const [editItem,   setEditItem]   = useState<Service | null>(null);
   const [deleteItem, setDeleteItem] = useState<Service | null>(null);
 
-  const handleSave = (data: typeof EMPTY_FORM) => {
+  const handleSave = (data: ServiceForm) => {
+    const payload = {
+      title_ar: data.title_ar,
+      title_en: data.title_en,
+      desc_ar: data.desc_ar,
+      desc_en: data.desc_en,
+      is_active: data.is_active,
+      sort_order: data.sort_order,
+      imageFile: data.uploadMode === "file" ? data.imageFile : null,
+      image_url: data.uploadMode === "url" ? data.image_url : (editItem ? editItem.image_url : undefined),
+    };
+
     if (editItem) {
       updateService(
-        { id: editItem.id, ...data },
+        { id: editItem.id, ...payload },
         { onSuccess: () => setEditItem(null) }
       );
     } else {
-      createService(data, { onSuccess: () => setShowAdd(false) });
+      createService(payload, { onSuccess: () => setShowAdd(false) });
     }
   };
 

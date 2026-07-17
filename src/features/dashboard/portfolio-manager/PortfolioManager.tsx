@@ -14,21 +14,24 @@ import type { PortfolioItem } from "../../../types/api.types";
 
 import { PortfolioModal, type PortfolioForm } from "./PortfolioModal";
 import { PortfolioPreviewModal, type PortfolioPreview } from "./PortfolioPreviewModal";
-import { toList, toCsv, type PortfolioItemExtended } from "./portfolioTransforms";
+import { toList, type PortfolioItemExtended } from "./portfolioTransforms";
 
 // ── Save payload builder ──────────────────────────────────────────────────
-// نفس منطق التحويل من الملف الأصلي، لكن بمكان واحد بدل تكراره، وبدون أي `as any`.
-function buildSavePayload(data: PortfolioForm) {
-  const galleryList = toList(data.gallery).filter(url => url !== data.image_url);
-
+function buildSavePayload(data: PortfolioForm, currentImageUrl?: string) {
   return {
-    ...data,
-    gallery: toCsv(galleryList),
-    // category_id فاضي = بدون تصنيف. القيمة نفسها الآن تأتي من <select> حقيقي في
-    // PortfolioModal (مش نص حر) فمفيش داعي لفحص هش زي `.includes("-")` بعد الآن.
+    title_ar: data.title_ar,
+    title_en: data.title_en,
     category_id: data.category_id || undefined,
+    description_ar: data.description_ar,
+    description_en: data.description_en,
+    client: data.client,
+    year: data.year,
+    is_featured: data.is_featured,
     scope_ar: toList(data.scope_ar),
     scope_en: toList(data.scope_en),
+    imageFile: data.uploadMode === "file" ? data.imageFile : null,
+    image_url: data.uploadMode === "url" ? data.image_url : (currentImageUrl || undefined),
+    galleryItems: data.galleryItems,
   };
 }
 
@@ -77,7 +80,7 @@ const PortfolioManager = () => {
   const filtered = filter === "featured" ? items.filter(i => i.is_featured) : items;
 
   const handleSave = (data: PortfolioForm) => {
-    const payload = buildSavePayload(data);
+    const payload = buildSavePayload(data, editItem?.image_url);
     if (editItem) {
       updateItem({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
     } else {

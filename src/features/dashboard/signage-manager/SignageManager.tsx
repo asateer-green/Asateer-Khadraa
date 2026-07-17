@@ -1,6 +1,6 @@
 // src/features/dashboard/signage-manager/SignageManager.tsx
 import { useState, type FormEvent } from "react";
-import { Plus, Pencil, Trash2, MapPin, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, MapPin, Image as ImageIcon, Upload } from "lucide-react";
 import {
   useSignage,
   useCreateSignage,
@@ -15,7 +15,15 @@ import { Switch } from "../../../components/ui/Switch";
 import { SafeImage, EmptyState, ListSkeleton } from "../../../components/ui/SafeImage";
 import type { SignageItem } from "../../../types/api.types";
 
-const EMPTY_FORM = { title_ar: "", title_en: "", location: "", image_url: "", is_active: true };
+const EMPTY_FORM = { 
+  title_ar: "", 
+  title_en: "", 
+  location: "", 
+  uploadMode: "file" as "url" | "file",
+  imageFile: null as File | null,
+  image_url: "", 
+  is_active: true 
+};
 type SignageForm = typeof EMPTY_FORM;
 
 // ── Add / Edit modal ─────────────────────────────────────────────────────
@@ -38,6 +46,8 @@ function SignageFormModal({
           title_ar: initial.title_ar,
           title_en: initial.title_en,
           location: initial.location ?? "",
+          uploadMode: "file",
+          imageFile: null,
           image_url: initial.image_url ?? "",
           is_active: initial.is_active,
         }
@@ -96,12 +106,47 @@ function SignageFormModal({
           />
         </Field>
 
-        <Field label={ar ? "رابط الصورة" : "Image URL"}>
-          <TextInput value={form.image_url} onChange={e => set("image_url", e.target.value)} type="url" placeholder="https://..." title="Image URL" />
-          {form.image_url && (
-            <SafeImage src={form.image_url} alt="preview" className="mt-2 h-36 w-full object-cover rounded-xl border border-(--border)" />
-          )}
+        {/* مصدر الصورة للوحة */}
+        <Field label={ar ? "مصدر الصورة" : "Image Source"}>
+          <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
+            {(["url", "file"] as const).map(mode => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => set("uploadMode", mode)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  form.uploadMode === mode ? "bg-(--card) text-(--foreground) shadow-sm" : "text-(--muted-foreground) hover:text-(--foreground)"
+                }`}
+              >
+                {mode === "url" ? (ar ? "رابط خارجي" : "External URL") : (ar ? "رفع من الجهاز" : "Upload File")}
+              </button>
+            ))}
+          </div>
         </Field>
+
+        <div className="space-y-1.5">
+          {form.uploadMode === "url" ? (
+            <TextInput value={form.image_url} onChange={e => set("image_url", e.target.value)} type="url" placeholder="https://..." title="Image URL" />
+          ) : (
+            <div className="relative border-2 border-dashed border-(--border) hover:border-(--primary)/50 rounded-xl px-4 py-3 flex items-center gap-2 cursor-pointer transition-colors">
+              <input type="file" accept="image/*" onChange={e => set("imageFile", e.target.files?.[0] ?? null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" title="signage_file" />
+              <Upload size={15} className="text-(--muted-foreground) shrink-0" />
+              <span className="text-sm text-(--muted-foreground) truncate">
+                {form.imageFile ? form.imageFile.name : (ar ? "اختر صورة اللوحة" : "Choose image file")}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {form.uploadMode === "url" && form.image_url && (
+          <SafeImage src={form.image_url} alt="preview" className="mt-2 h-36 w-full object-cover rounded-xl border border-(--border)" />
+        )}
+        {form.uploadMode === "file" && form.image_url && !form.imageFile && (
+          <div className="space-y-1">
+            <span className="text-xs text-(--muted-foreground)">{ar ? "الصورة الحالية:" : "Current Image:"}</span>
+            <SafeImage src={form.image_url} alt="current" className="h-36 w-full object-cover rounded-xl border border-(--border)" />
+          </div>
+        )}
 
         <Switch
           checked={form.is_active}
@@ -130,10 +175,19 @@ const SignageManager = () => {
   const isSaving = isCreating || isUpdating;
 
   const handleSave = (data: SignageForm) => {
+    const payload = {
+      title_ar: data.title_ar,
+      title_en: data.title_en,
+      location: data.location,
+      is_active: data.is_active,
+      imageFile: data.uploadMode === "file" ? data.imageFile : null,
+      image_url: data.uploadMode === "url" ? data.image_url : (editItem ? editItem.image_url : undefined),
+    };
+
     if (editItem) {
-      update({ id: editItem.id, ...data }, { onSuccess: () => setEditItem(null) });
+      update({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
     } else {
-      create(data, { onSuccess: () => setShowAdd(false) });
+      create(payload, { onSuccess: () => setShowAdd(false) });
     }
   };
 
