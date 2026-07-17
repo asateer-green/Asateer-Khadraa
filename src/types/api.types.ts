@@ -65,3 +65,13 @@ export interface PaginatedResponse<T> {
   data:  T[];
   count: number;
 }
+
+// في types/api.types.ts
+export interface Logo {
+  id: number;
+  title_ar: string;
+  title_en: string;
+  image_url: string;
+  sort_order: number;
+  is_active: boolean;
+}

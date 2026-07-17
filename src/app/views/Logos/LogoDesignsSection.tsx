@@ -1,5 +1,5 @@
 import { useLanguageContext } from "../../providers/LanguageProvider";
-import { useLogoDesigns } from "../../../hooks/api/useLogoDesigns"; // استدعاء الهوك الذي أنشأناه بالخطوة 1
+import { useLogos } from "../../../hooks/api/useLogos"; // استدعاء الهوك الذي أنشأناه بالخطوة 1
 import { Palette } from "lucide-react";
 
 import logo1 from "../../../assets/logos/logo1.png";
@@ -17,7 +17,7 @@ const fallbackDesigns = [
 
 export function LogoDesignsSection() {
   const { language } = useLanguageContext();
-  const { data: dbDesigns, isLoading } = useLogoDesigns();
+  const { data: dbDesigns, isLoading } = useLogos();
 
   // إذا نجح السيرفر في جلب بيانات نستخدمها، وإلا نعتمد على الكروت الاحتياطية الثابتة ليبقى الموقع فخماً
   const designsItems = dbDesigns && dbDesigns.length > 0 ? dbDesigns : fallbackDesigns;
