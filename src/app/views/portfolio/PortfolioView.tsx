@@ -51,6 +51,7 @@ import Booth8 from "../../../assets/images/Booth/Booth8.jpeg";
 import Booth9 from "../../../assets/images/Booth/Booth9.jpeg";
 
 import { LogoDesignsSection } from "../Logos/LogoDesignsSection";
+// dynamicSignages
 
 const mainImages = [
   pIdentity,
@@ -271,31 +272,57 @@ export function PortfolioView() {
       })
     : [];
 
-  // هيكلة اللوحات القادمة من قسم "إدارة اللوحات" ديناميكياً ودمجها مع التصنيفات المناسبة
+ // هيكلة اللوحات القادمة من قسم "إدارة اللوحات" ديناميكياً وقراءة التفاصيل الحقيقية بنفس منطق المشاريع
   const dynamicSignages = dbSignage
     ? dbSignage
         .filter((s: any) => s.is_active !== false)
         .map((s: any) => {
-          // محاولة ربط اللوحة بتصنيف "لوحات" أو "Signage" من التصنيفات الفعلية
+          // 1. تجهيز معرض الصور (معالجة الصور الإضافية المرفوعة كـ Array أو String ودمجها مع الصورة الرئيسية)
+          let galleryArray: string[] = [];
+          if (s.gallery) {
+            if (Array.isArray(s.gallery)) {
+              galleryArray = s.gallery.filter(Boolean);
+            } else if (typeof s.gallery === "string") {
+              galleryArray = s.gallery
+                .split(",")
+                .map((url: string) => url.trim())
+                .filter(Boolean);
+            }
+          }
+
+          if (s.image_url) {
+            galleryArray = [
+              s.image_url,
+              ...galleryArray.filter((url) => url !== s.image_url),
+            ];
+          }
+
+          // 2. ربط اللوحة بتصنيف "لوحات" أو "Signage" من قائمة التصنيفات الفعلية
           const matchedSignageCat = categoriesList.find(
             (c) => c.name_ar.includes("لوحات") || c.name_en.toLowerCase().includes("signage")
           );
 
+          // 3. قراءة البيانات التفصيلية المكتوبة في الفورم
           return {
             title: ar ? s.title_ar : s.title_en,
             category: ar ? "التصنيع واللوحات" : "Signage & Manufacturing",
             categoryIdRaw: matchedSignageCat ? matchedSignageCat.id : "signage-fallback-id",
-            description:
-              ar
-                ? `لوحة مخصصة تم تصنيعها وتركيبها بدقة في موقع: ${s.location || "غير محدد"}.`
-                : `Custom signage manufactured and installed at: ${s.location || "N/A"}.`,
-            client: ar ? "طلب خاص" : "Custom Order",
-            year: "2026",
+            description: ar ? (s.description_ar || s.description) : (s.description_en || s.description),
+            client: s.client || "—",
+            year: s.year || "—",
             scope:
               ar
-                ? ["تصنيع هيكلي", "تركيب خارجي"]
-                : ["Structural Fabrication", "Field Installation"],
-            gallery: [s.image_url],
+                ? s.scope_ar
+                  ? Array.isArray(s.scope_ar)
+                    ? s.scope_ar
+                    : s.scope_ar.split(",").map((item: string) => item.trim())
+                  : []
+                : s.scope_en
+                  ? Array.isArray(s.scope_en)
+                    ? s.scope_en
+                    : s.scope_en.split(",").map((item: string) => item.trim())
+                  : [],
+            gallery: galleryArray,
             image_url: s.image_url,
           };
         })

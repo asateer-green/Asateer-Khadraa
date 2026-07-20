@@ -47,7 +47,10 @@ export interface SignageItem {
   title_ar:    string;
   title_en:    string;
   location?:   string;
+  /** @deprecated kept for backward compatibility, always kept equal to images[0]. Prefer `images`. */
   image_url?:  string;
+  /** Ordered image URLs — first entry is the cover shown in lists/cards. */
+  images?:     string[];
   is_active:   boolean;
   created_at:  string;
 }

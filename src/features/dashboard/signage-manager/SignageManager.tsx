@@ -1,6 +1,6 @@
 // src/features/dashboard/signage-manager/SignageManager.tsx
-import { useState, type FormEvent } from "react";
-import { Plus, Pencil, Trash2, MapPin, Image as ImageIcon, Upload } from "lucide-react";
+import { useState } from "react";
+import { Plus, Pencil, Trash2, ImageIcon, MapPin } from "lucide-react";
 import {
   useSignage,
   useCreateSignage,
@@ -8,191 +8,91 @@ import {
   useDeleteSignage,
 } from "../../../hooks/api/useSignage";
 import { useLanguage } from "../../../hooks/ui/useLanguage";
-import { Modal } from "../../../components/ui/Modal";
 import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
-import { Field, TextInput } from "../../../components/ui/FormField";
-import { Switch } from "../../../components/ui/Switch";
-import { SafeImage, EmptyState, ListSkeleton } from "../../../components/ui/SafeImage";
+import { GridSkeleton } from "../../../components/ui/SafeImage";
 import type { SignageItem } from "../../../types/api.types";
 
-const EMPTY_FORM = { 
-  title_ar: "", 
-  title_en: "", 
-  location: "", 
-  uploadMode: "file" as "url" | "file",
-  imageFile: null as File | null,
-  image_url: "", 
-  is_active: true 
-};
-type SignageForm = typeof EMPTY_FORM;
+import { SignageModal, type SignageForm } from "./SignageModal";
+import { SignagePreviewModal, type SignagePreview } from "./SignagePreviewModal";
+import { toList, type SignageItemExtended } from "./signageTransforms";
 
-// ── Add / Edit modal ─────────────────────────────────────────────────────
-function SignageFormModal({
-  initial,
-  ar,
-  onClose,
-  onSave,
-  isSaving,
-}: {
-  initial: SignageItem | null;
-  ar: boolean;
-  onClose: () => void;
-  onSave: (data: SignageForm) => void;
-  isSaving: boolean;
-}) {
-  const [form, setForm] = useState<SignageForm>(
-    initial
-      ? {
-          title_ar: initial.title_ar,
-          title_en: initial.title_en,
-          location: initial.location ?? "",
-          uploadMode: "file",
-          imageFile: null,
-          image_url: initial.image_url ?? "",
-          is_active: initial.is_active,
-        }
-      : EMPTY_FORM,
-  );
-  const set = <K extends keyof SignageForm>(key: K, value: SignageForm[K]) =>
-    setForm(f => ({ ...f, [key]: value }));
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!form.title_ar.trim() || !form.title_en.trim()) return;
-    onSave(form);
+// ── Save payload builder ──────────────────────────────────────────────────
+// نفس منطق buildSavePayload في PortfolioManager.tsx بالحرف، عشان الحفظ يتصرف
+// بنفس الطريقة تماماً ويوصل للعرض على الموقع بنفس الآلية.
+function buildSavePayload(data: SignageForm, currentImageUrl?: string) {
+  return {
+    title_ar: data.title_ar,
+    title_en: data.title_en,
+    location: data.location,
+    description_ar: data.description_ar,
+    description_en: data.description_en,
+    client: data.client,
+    year: data.year,
+    is_active: data.is_active,
+    scope_ar: toList(data.scope_ar),
+    scope_en: toList(data.scope_en),
+    imageFile: data.uploadMode === "file" ? data.imageFile : null,
+    image_url: data.uploadMode === "url" ? data.image_url : (currentImageUrl || undefined),
+    galleryItems: data.galleryItems,
   };
-
-  return (
-    <Modal
-      title={initial ? (ar ? "تعديل اللوحة" : "Edit Signage") : (ar ? "إضافة لوحة" : "Add Signage")}
-      closeLabel={ar ? "إغلاق" : "Close"}
-      onClose={onClose}
-      footer={
-        <>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-sm text-(--muted-foreground) hover:bg-(--muted) transition-colors"
-          >
-            {ar ? "إلغاء" : "Cancel"}
-          </button>
-          <button
-            form="signage-form"
-            type="submit"
-            disabled={isSaving}
-            className="px-5 py-2 rounded-xl text-sm font-medium bg-(--primary) text-(--primary-foreground) hover:opacity-90 disabled:opacity-50"
-          >
-            {isSaving ? "..." : initial ? (ar ? "حفظ" : "Save") : (ar ? "إضافة" : "Add")}
-          </button>
-        </>
-      }
-    >
-      <form id="signage-form" onSubmit={handleSubmit} className="p-6 space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label={ar ? "الاسم بالعربي" : "Name (AR)"} required>
-            <TextInput value={form.title_ar} onChange={e => set("title_ar", e.target.value)} required dir="rtl" placeholder="اسم اللوحة" title="Arabic name" />
-          </Field>
-          <Field label={ar ? "الاسم بالإنجليزي" : "Name (EN)"} required>
-            <TextInput value={form.title_en} onChange={e => set("title_en", e.target.value)} required dir="ltr" placeholder="Signage name" title="English name" />
-          </Field>
-        </div>
-
-        <Field label={ar ? "الموقع / المكان" : "Location"}>
-          <TextInput
-            value={form.location}
-            onChange={e => set("location", e.target.value)}
-            placeholder={ar ? "مثال: الرياض، حي العليا" : "e.g. Riyadh, Al-Olaya"}
-            title="Location"
-          />
-        </Field>
-
-        {/* مصدر الصورة للوحة */}
-        <Field label={ar ? "مصدر الصورة" : "Image Source"}>
-          <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
-            {(["url", "file"] as const).map(mode => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => set("uploadMode", mode)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  form.uploadMode === mode ? "bg-(--card) text-(--foreground) shadow-sm" : "text-(--muted-foreground) hover:text-(--foreground)"
-                }`}
-              >
-                {mode === "url" ? (ar ? "رابط خارجي" : "External URL") : (ar ? "رفع من الجهاز" : "Upload File")}
-              </button>
-            ))}
-          </div>
-        </Field>
-
-        <div className="space-y-1.5">
-          {form.uploadMode === "url" ? (
-            <TextInput value={form.image_url} onChange={e => set("image_url", e.target.value)} type="url" placeholder="https://..." title="Image URL" />
-          ) : (
-            <div className="relative border-2 border-dashed border-(--border) hover:border-(--primary)/50 rounded-xl px-4 py-3 flex items-center gap-2 cursor-pointer transition-colors">
-              <input type="file" accept="image/*" onChange={e => set("imageFile", e.target.files?.[0] ?? null)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" title="signage_file" />
-              <Upload size={15} className="text-(--muted-foreground) shrink-0" />
-              <span className="text-sm text-(--muted-foreground) truncate">
-                {form.imageFile ? form.imageFile.name : (ar ? "اختر صورة اللوحة" : "Choose image file")}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {form.uploadMode === "url" && form.image_url && (
-          <SafeImage src={form.image_url} alt="preview" className="mt-2 h-36 w-full object-cover rounded-xl border border-(--border)" />
-        )}
-        {form.uploadMode === "file" && form.image_url && !form.imageFile && (
-          <div className="space-y-1">
-            <span className="text-xs text-(--muted-foreground)">{ar ? "الصورة الحالية:" : "Current Image:"}</span>
-            <SafeImage src={form.image_url} alt="current" className="h-36 w-full object-cover rounded-xl border border-(--border)" />
-          </div>
-        )}
-
-        <Switch
-          checked={form.is_active}
-          onChange={v => set("is_active", v)}
-          label={ar ? "نشطة" : "Active"}
-        />
-      </form>
-    </Modal>
-  );
 }
 
-// ── Main page ────────────────────────────────────────────────────────────
+// ── Preview data builder ──────────────────────────────────────────────────
+function buildPreview(item: SignageItemExtended, ar: boolean): SignagePreview {
+  const description = ar ? item.description_ar : item.description_en;
+  const scope = toList(ar ? item.scope_ar : item.scope_en);
+
+  let gallery = toList(item.gallery ?? item.images);
+  if (item.image_url) {
+    gallery = [item.image_url, ...gallery.filter(url => url !== item.image_url)];
+  }
+
+  return {
+    title: ar ? item.title_ar : item.title_en,
+    tag: item.location || (ar ? "لوحة إعلانية" : "Signage"),
+    description: description?.trim()
+      ? description
+      : ar
+        ? "لم يتم إضافة تفاصيل عن اللوحة بعد."
+        : "No signage details have been added yet.",
+    client: item.client || "—",
+    year: item.year || "—",
+    scope,
+    gallery,
+  };
+}
+
+// ── Main page ──────────────────────────────────────────────────────────────
 const SignageManager = () => {
   const { language } = useLanguage();
   const ar = language === "ar";
 
-  const { data: items = [], isLoading } = useSignage();
-  const { mutate: create, isPending: isCreating } = useCreateSignage();
-  const { mutate: update, isPending: isUpdating } = useUpdateSignage();
-  const { mutate: remove, isPending: isDeleting } = useDeleteSignage();
+  const { data: items = [], isLoading, isError } = useSignage();
+  const { mutate: createItem, isPending: isCreating } = useCreateSignage();
+  const { mutate: updateItem, isPending: isUpdating } = useUpdateSignage();
+  const { mutate: deleteItem, isPending: isDeleting } = useDeleteSignage();
 
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState<SignageItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SignageItem | null>(null);
+  const [previewItem, setPreviewItem] = useState<SignagePreview | null>(null);
+  const [filter, setFilter] = useState<"all" | "active">("all");
 
   const isSaving = isCreating || isUpdating;
+  const filtered = filter === "active" ? items.filter(i => i.is_active) : items;
 
   const handleSave = (data: SignageForm) => {
-    const payload = {
-      title_ar: data.title_ar,
-      title_en: data.title_en,
-      location: data.location,
-      is_active: data.is_active,
-      imageFile: data.uploadMode === "file" ? data.imageFile : null,
-      image_url: data.uploadMode === "url" ? data.image_url : (editItem ? editItem.image_url : undefined),
-    };
-
+    const payload = buildSavePayload(data, editItem?.image_url);
     if (editItem) {
-      update({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
+      updateItem({ id: editItem.id, ...payload }, { onSuccess: () => setEditItem(null) });
     } else {
-      create(payload, { onSuccess: () => setShowAdd(false) });
+      createItem(payload, { onSuccess: () => setShowAdd(false) });
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5">
+    <div className="max-w-5xl mx-auto space-y-5">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-(--foreground)">{ar ? "إدارة اللوحات" : "Signage Manager"}</h1>
@@ -207,72 +107,87 @@ const SignageManager = () => {
         </button>
       </div>
 
-      <div className="rounded-2xl bg-(--card) border border-(--border) overflow-hidden">
-        {isLoading ? (
-          <ListSkeleton count={3} rowClassName="h-16" />
-        ) : items.length === 0 ? (
-          <EmptyState
-            message={ar ? "لا توجد لوحات بعد" : "No signage yet"}
-            actionLabel={ar ? "أضف أول لوحة" : "Add your first signage"}
-            onAction={() => setShowAdd(true)}
-          />
-        ) : (
-          <div className="divide-y divide-(--border)">
-            {items.map(item => (
-              <div key={item.id} className="flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 hover:bg-(--muted)/30 transition-colors group">
-                {item.image_url ? (
-                  <SafeImage src={item.image_url} alt={item.title_ar} className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-(--border) shrink-0" />
-                ) : (
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-(--muted) flex items-center justify-center shrink-0">
-                    <ImageIcon size={20} className="text-(--muted-foreground)" />
-                  </div>
-                )}
-
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-(--foreground) truncate text-sm sm:text-base">{ar ? item.title_ar : item.title_en}</p>
-                  {item.location && (
-                    <p className="text-xs text-(--muted-foreground) truncate flex items-center gap-1">
-                      <MapPin size={11} className="shrink-0" /> {item.location}
-                    </p>
-                  )}
-                  <span
-                    className={`sm:hidden inline-flex mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                      item.is_active
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : "bg-(--muted) text-(--muted-foreground)"
-                    }`}
-                  >
-                    {item.is_active ? (ar ? "نشطة" : "Active") : (ar ? "مخفية" : "Hidden")}
-                  </span>
-                </div>
-
-                <span
-                  className={`hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${
-                    item.is_active
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                      : "bg-(--muted) text-(--muted-foreground)"
-                  }`}
-                >
-                  {item.is_active ? (ar ? "نشطة" : "Active") : (ar ? "مخفية" : "Hidden")}
-                </span>
-
-                <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => setEditItem(item)} aria-label={ar ? "تعديل" : "Edit"} className="w-8 h-8 rounded-lg flex items-center justify-center text-(--muted-foreground) hover:bg-(--muted) hover:text-(--foreground) transition-colors">
-                    <Pencil size={14} />
-                  </button>
-                  <button onClick={() => setDeleteTarget(item)} aria-label={ar ? "حذف" : "Delete"} className="w-8 h-8 rounded-lg flex items-center justify-center text-(--muted-foreground) hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30 transition-colors">
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Filter tabs */}
+      <div className="flex gap-1 p-1 bg-(--muted)/50 rounded-xl w-fit">
+        {[{ key: "all" as const, ar: "الكل", en: "All" }, { key: "active" as const, ar: "النشطة", en: "Active" }].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setFilter(tab.key)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              filter === tab.key ? "bg-(--card) text-(--foreground) shadow-sm" : "text-(--muted-foreground) hover:text-(--foreground)"
+            }`}
+          >
+            {tab[language as "ar" | "en"]}
+          </button>
+        ))}
       </div>
 
+      {/* Grid */}
+      {isLoading ? (
+        <GridSkeleton count={8} />
+      ) : isError ? (
+        <p className="text-center text-sm text-(--muted-foreground) py-12">{ar ? "تعذّر تحميل اللوحات" : "Could not load signage"}</p>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 space-y-3">
+          <p className="text-(--muted-foreground)">{ar ? "لا توجد لوحات بعد" : "No signage yet"}</p>
+          <button onClick={() => setShowAdd(true)} className="text-sm text-(--primary) hover:underline">
+            {ar ? "أضف أول لوحة" : "Add your first signage"}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filtered.map(item => (
+            <div
+              key={item.id}
+              onClick={() => setPreviewItem(buildPreview(item as SignageItemExtended, ar))}
+              className="group relative rounded-2xl overflow-hidden border border-(--border) bg-(--card) aspect-square cursor-pointer transition-all duration-300 hover:border-emerald-500/30"
+            >
+              {item.image_url ? (
+                <img src={item.image_url} alt={ar ? item.title_ar : item.title_en} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-(--muted)">
+                  <ImageIcon size={32} className="text-(--muted-foreground)" />
+                </div>
+              )}
+
+              {item.is_active && (
+                <div className="absolute top-2 inset-s-2 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-emerald-400/30 z-10" title={ar ? "نشطة" : "Active"} />
+              )}
+
+              <div className="absolute inset-0 bg-black/40 sm:bg-black/60 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2 sm:p-3 z-20">
+                <div className="flex justify-end gap-1">
+                  <button
+                    onClick={e => { e.stopPropagation(); setEditItem(item); }}
+                    aria-label={ar ? "تعديل" : "Edit"}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    onClick={e => { e.stopPropagation(); setDeleteTarget(item); }}
+                    aria-label={ar ? "حذف" : "Delete"}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-500/80 hover:bg-red-500 flex items-center justify-center text-white transition-colors"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+                <div>
+                  <p className="text-white text-xs sm:text-sm font-medium truncate">{ar ? item.title_ar : item.title_en}</p>
+                  {item.location && (
+                    <p className="text-white/70 text-[10px] sm:text-xs truncate flex items-center gap-1">
+                      <MapPin size={10} className="shrink-0" /> {item.location}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {(showAdd || editItem) && (
-        <SignageFormModal
-          initial={editItem}
+        <SignageModal
+          initial={editItem as SignageItemExtended ?? undefined}
           ar={ar}
           onClose={() => { setShowAdd(false); setEditItem(null); }}
           onSave={handleSave}
@@ -282,14 +197,17 @@ const SignageManager = () => {
 
       {deleteTarget && (
         <ConfirmDialog
-          title={ar ? "هل تريد حذف هذه اللوحة؟" : "Delete this signage item?"}
+          title={ar ? "حذف اللوحة" : "Delete Signage"}
+          description={ar ? `هل تريد حذف "${deleteTarget.title_ar}"؟` : `Delete "${deleteTarget.title_en}"?`}
           confirmLabel={ar ? "حذف" : "Delete"}
           cancelLabel={ar ? "إلغاء" : "Cancel"}
           onClose={() => setDeleteTarget(null)}
-          onConfirm={() => remove(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })}
+          onConfirm={() => deleteItem(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })}
           isLoading={isDeleting}
         />
       )}
+
+      {previewItem && <SignagePreviewModal item={previewItem} ar={ar} onClose={() => setPreviewItem(null)} />}
     </div>
   );
 };
