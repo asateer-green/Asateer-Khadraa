@@ -1,4 +1,3 @@
-import { AboutSection } from "./components/AboutSection";
 import { FeaturedWork } from "./components/FeaturedWork";
 import { Features } from "./components/Features";
 import { Hero } from "./components/Hero";
@@ -10,9 +9,9 @@ export function Home() {
       style={{ minHeight: "100vh", backgroundColor: "var(--color-bg-primary)" }}
     >
       <Hero />
-      <AboutSection />
-      <Services />
       <FeaturedWork />
+      <Services />
+
       <Features />
     </div>
   );

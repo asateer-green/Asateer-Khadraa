@@ -15,6 +15,8 @@ import { ContactView }  from "../views/contact/ContactView";
 // ── Website pages (lazy) ───────────────────────────────────────────────────
 const Home      = lazy(() => import("../../features/website/home/HomeView"));
 import QuoteForm from "../views/QuoteForm/QuoteForm";
+import About from "../../features/website/home/components/About";
+// import AboutSection from "../../features/website/home/components/About";
 
 // ── Dashboard pages (lazy) ────────────────────────────────────────────────
 const DashboardHome = lazy(() => import("../../features/dashboard/overview/DashboardHome"));
@@ -50,6 +52,7 @@ const routes: RouteObject[] = [
       { index: true,                element: <Home /> },
       { path: ROUTES.SERVICES,      element: <ServicesView /> },
       { path: ROUTES.PORTFOLIO,     element: <PortfolioView /> },
+      { path: ROUTES.ABOUT,         element: < About /> },
       { path: ROUTES.CONTACT,       element: <ContactView /> },
       { path: ROUTES.QUOTE_REQUEST, element: <QuoteForm /> },
     ],

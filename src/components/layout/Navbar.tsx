@@ -26,10 +26,10 @@ interface NavItem {
 }
 const NAV_ITEMS: NavItem[] = [
   { labelKey: "nav.home", href: ROUTES.HOME },
-  // { labelKey: "nav.about", href: ROUTES.ABOUT },
+  { labelKey: "nav.about", href: ROUTES.ABOUT },
   { labelKey: "nav.services", href: ROUTES.SERVICES },
   { labelKey: "nav.portfolio", href: ROUTES.PORTFOLIO },
-  { labelKey: "nav.contact", href: ROUTES.CONTACT },
+  // { labelKey: "nav.contact", href: ROUTES.CONTACT },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,23 +90,6 @@ const MoonIcon = () => (
     <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
   </svg>
 );
-const MenuIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <line x1="3" y1="6" x2="21" y2="6" />
-    <line x1="3" y1="12" x2="21" y2="12" />
-    <line x1="3" y1="18" x2="21" y2="18" />
-  </svg>
-);
 const CloseIcon = () => (
   <svg
     width="22"
@@ -142,6 +125,133 @@ const GlobeIcon = () => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Bottom tab-bar icons (LinkedIn-style: icon + label, mobile only)
+// ─────────────────────────────────────────────────────────────────────────────
+const HomeTabIcon = ({ active }: { active?: boolean }) => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill={active ? "currentColor" : "none"}
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3 11.5 12 4l9 7.5" />
+    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
+  </svg>
+);
+const ServicesTabIcon = ({ active }: { active?: boolean }) => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect
+      x="3"
+      y="7"
+      width="18"
+      height="13"
+      rx="2"
+      fill={active ? "currentColor" : "none"}
+      fillOpacity={active ? 0.15 : 0}
+    />
+    <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+    <line x1="3" y1="12" x2="21" y2="12" />
+  </svg>
+);
+const PortfolioTabIcon = ({ active }: { active?: boolean }) => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect
+      x="3"
+      y="4"
+      width="18"
+      height="16"
+      rx="2"
+      fill={active ? "currentColor" : "none"}
+      fillOpacity={active ? 0.15 : 0}
+    />
+    <circle cx="8.5" cy="9.5" r="1.5" />
+    <path d="m21 15-5-5-9 9" />
+  </svg>
+);
+const ContactTabIcon = ({ active }: { active?: boolean }) => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect
+      x="2"
+      y="5"
+      width="20"
+      height="14"
+      rx="2"
+      fill={active ? "currentColor" : "none"}
+      fillOpacity={active ? 0.15 : 0}
+    />
+    <path d="m3 7 9 6 9-6" />
+  </svg>
+);
+const MoreTabIcon = ({ active }: { active?: boolean }) => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="4.5" cy="12" r="1.6" fill={active ? "currentColor" : "none"} />
+    <circle cx="12" cy="12" r="1.6" fill={active ? "currentColor" : "none"} />
+    <circle cx="19.5" cy="12" r="1.6" fill={active ? "currentColor" : "none"} />
+  </svg>
+);
+
+// خريطة الأيقونات لكل رابط — بترجع الأيقونة المناسبة حسب href
+function getBottomTabIcon(href: string, active: boolean) {
+  switch (href) {
+    case ROUTES.HOME:
+      return <HomeTabIcon active={active} />;
+    case ROUTES.SERVICES:
+      return <ServicesTabIcon active={active} />;
+    case ROUTES.PORTFOLIO:
+      return <PortfolioTabIcon active={active} />;
+    case ROUTES.CONTACT:
+      return <ContactTabIcon active={active} />;
+    default:
+      return <HomeTabIcon active={active} />;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Navbar
 // ─────────────────────────────────────────────────────────────────────────────
 export function Navbar() {
@@ -155,7 +265,7 @@ export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const drawerRef = useRef<HTMLDivElement>(null);
-  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const moreTabRef = useRef<HTMLButtonElement>(null);
   const isRtl = direction === "rtl";
 
   // ── close drawer on route change ──
@@ -206,7 +316,7 @@ export function Navbar() {
     const esc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setDrawerOpen(false);
-        hamburgerRef.current?.focus();
+        moreTabRef.current?.focus();
       }
     };
     document.addEventListener("keydown", trap);
@@ -300,6 +410,18 @@ export function Navbar() {
         .drawer-link:hover {
           color: var(--color-brand-500) !important;
           background: color-mix(in srgb, var(--color-brand-500) 8%, transparent) !important;
+        }
+        .bottom-tab-link:active {
+          opacity: 0.6;
+        }
+
+        /* بنسيب مساحة تحت محتوى الصفحة عشان مايتغطاش بالـ bottom tab bar
+           (بنستهدف الـ body مباشرة عشان الـ Navbar ممكن يترندر فوق الـ Outlet
+           وأي spacer محلي هنا مش هيوصل لآخر الصفحة فعلياً) */
+        @media (max-width: 767px) {
+          body {
+            padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+          }
         }
       `}</style>
 
@@ -495,21 +617,6 @@ export function Navbar() {
               </Link>
             )}
 
-            {/* Hamburger — mobile only */}
-            {isMobile && (
-              <button
-                ref={hamburgerRef}
-                type="button"
-                onClick={() => setDrawerOpen((v) => !v)}
-                className="icon-btn"
-                style={{ ...iconBtn, marginInlineStart: "4px" }}
-                aria-expanded={drawerOpen}
-                aria-controls="mobile-nav-drawer"
-                aria-label={drawerOpen ? t("common.close") : "فتح القائمة"}
-              >
-                {drawerOpen ? <CloseIcon /> : <MenuIcon />}
-              </button>
-            )}
           </div>
         </nav>
       </header>
@@ -726,6 +833,106 @@ export function Navbar() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Bottom tab bar (mobile only) — أيقونة فوق واسمها تحت، زي LinkedIn ── */}
+      {isMobile && (
+        <nav
+          aria-label="القائمة السفلية"
+          style={{
+            position: "fixed",
+            bottom: 0,
+            insetInline: 0,
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "stretch",
+            background: "var(--color-bg-card)",
+            borderTop: "1px solid var(--color-border)",
+            boxShadow: "0 -4px 20px -8px rgba(0,0,0,0.12)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          {NAV_ITEMS.map((item) => {
+            const isActive =
+              item.href === ROUTES.HOME
+                ? location.pathname === item.href
+                : location.pathname.startsWith(item.href);
+            return (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                end={item.href === ROUTES.HOME}
+                className="bottom-tab-link"
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "3px",
+                  padding: "6px 2px 8px",
+                  textDecoration: "none",
+                  color: isActive
+                    ? "var(--color-brand-500)"
+                    : "var(--color-text-secondary)",
+                  transition: "color 0.18s",
+                }}
+              >
+                {getBottomTabIcon(item.href, isActive)}
+                <span
+                  style={{
+                    fontSize: "0.65rem",
+                    fontWeight: isActive ? 600 : 500,
+                    lineHeight: 1,
+                    whiteSpace: "nowrap",
+                    maxWidth: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {t(item.labelKey)}
+                </span>
+              </NavLink>
+            );
+          })}
+
+          {/* More — بيفتح نفس الدرج (الثيم / اللغة / اطلب عرض سعر) */}
+          <button
+            ref={moreTabRef}
+            type="button"
+            onClick={() => setDrawerOpen((v) => !v)}
+            aria-expanded={drawerOpen}
+            aria-controls="mobile-nav-drawer"
+            aria-label={drawerOpen ? t("common.close") : "المزيد"}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "3px",
+              padding: "6px 2px 8px",
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              color: drawerOpen
+                ? "var(--color-brand-500)"
+                : "var(--color-text-secondary)",
+              transition: "color 0.18s",
+            }}
+          >
+            {drawerOpen ? <CloseIcon /> : <MoreTabIcon active={drawerOpen} />}
+            <span
+              style={{
+                fontSize: "0.65rem",
+                fontWeight: drawerOpen ? 600 : 500,
+                lineHeight: 1,
+              }}
+            >
+              {language === "ar" ? "المزيد" : "More"}
+            </span>
+          </button>
+        </nav>
       )}
 
       {/* Spacer for fixed header */}
