@@ -557,7 +557,7 @@ export function PortfolioView() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-(--color-brand) mb-1.5">
                       {item.category}
                     </p>
-                    <p className="text-base md:text-lg font-black text-white tracking-tight drop-shadow-xs">
+                    <p className="text-sm md:text-lg font-black text-white tracking-tight drop-shadow-xs">
                       {item.title}
                     </p>
                   </figcaption>
