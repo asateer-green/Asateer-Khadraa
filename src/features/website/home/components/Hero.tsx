@@ -111,7 +111,7 @@ export function Hero() {
         </div>
 
         {/* نقاط إثبات الثقة (Trust Indicators) */}
-        <div className="mt-16 pt-8 border-t border-(--color-border)/50 w-full max-w-lg flex items-center justify-center gap-8 text-xs md:text-sm text-(--color-muted-foreground)">
+        <div className="mt-5 pt-8 border-t border-(--color-border)/50 w-full max-w-lg flex items-center justify-center gap-8 text-xs md:text-sm text-(--color-muted-foreground)">
           <div className="flex items-center gap-2">
             <span className="text-(--color-primary) font-bold">✓</span>
             <span>{isAr ? "جودة طباعة عالية" : "High Quality Print"}</span>
