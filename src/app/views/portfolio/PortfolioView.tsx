@@ -19,6 +19,7 @@ import { useSignage } from "../../../hooks/api/useSignage"; // استيراد ا
 import { useCategories } from "../../../hooks/api/useCategories"; // استيراد الـ Hook الخاص بالتصنيفات
 
 // استيراد صور المعرض الفاخرة كاحتياطي وصور للتصنيفات الافتراضية
+import heroImage from "../../../assets/logos/logoweb.png";
 import pIdentity from "../../../assets/images/portfolio-identity.jpg";
 import pLogos from "../../../assets/images/portfolio-logos.jpg";
 import pManufacturing from "../../../assets/images/service-manufacturing.jpg";
@@ -367,33 +368,86 @@ export function PortfolioView() {
     <main className="w-full min-h-screen bg-(--color-background) animate-in fade-in duration-500 overflow-hidden">
       
       {/* ── أولاً: البانر الترحيبي الهندسي الفاخر ── */}
-      <section className="relative w-full py-20 md:py-28 border-b border-zinc-200 dark:border-zinc-800 bg-linear-to-b from-zinc-50 to-white dark:from-green-950 dark:to-(--color-background)">
-        <div className="absolute inset-0 pointer-events-none select-none opacity-[0.35] dark:opacity-[0.15] bg-[linear-gradient(to_right,rgba(0,229,147,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,229,147,0.12)_1px,transparent_1px)] bg-size-[32px_32px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-400/20 dark:bg-(--color-brand)/15 blur-[100px] rounded-full pointer-events-none select-none" />
+     <section className="relative min-h-[65vh] md:min-h-[70vh] w-full overflow-hidden flex items-center justify-center text-center border-b border-(--color-border) bg-(--color-background) py-20 md:py-28">
+  {/* 1. طبقة الجراديانت الخلفية - إضاءة ناعمة ومركزية */}
+  <div
+    className="absolute inset-0 z-0 pointer-events-none"
+    style={{
+      background:
+        "radial-gradient(circle at 50% 35%, color-mix(in oklab, var(--color-primary) 18%, transparent) 0%, transparent 70%), linear-gradient(180deg, color-mix(in oklab, var(--color-background) 100%, transparent) 0%, color-mix(in oklab, var(--color-primary) 6%, var(--color-background)) 100%)",
+    }}
+  />
 
-        <div className="container-x max-w-7xl px-6 mx-auto relative z-10 flex flex-col items-center text-center">
-          <nav className="flex items-center gap-2 mb-5 text-xs font-bold text-zinc-500 dark:text-zinc-900 uppercase tracking-wider" dir={ar ? "rtl" : "ltr"}>
-            <Link to={ROUTES.HOME} className="hover:text-(--color-brand) transition-colors">
-              {ar ? "الرئيسية" : "Home"}
-            </Link>
-            <span className="text-zinc-300 dark:text-zinc-300">/</span>
-            <span className="text-(--color-brand) font-extrabold">
-              {ar ? "أعمالنا" : "Our Portfolio"}
-            </span>
-          </nav>
+  {/* 2. شبكة Grid Pattern - متناسقة ومخفية الأطراف */}
+  <div
+    className="absolute inset-0 z-0 pointer-events-none opacity-[0.07] dark:opacity-[0.12]"
+    style={{
+      backgroundImage:
+        "linear-gradient(to right, var(--color-foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--color-foreground) 1px, transparent 1px)",
+      backgroundSize: "40px 40px",
+      maskImage:
+        "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+      WebkitMaskImage:
+        "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+    }}
+  />
 
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-white tracking-tight mb-5 max-w-3xl leading-tight">
-            {ar ? "أعمال مختارة صُنعت بشغف" : "Crafting Iconic Brand Experiences"}
-          </h1>
+  {/* 3. إضاءات خلفية متوهجة (Ambient Glows) */}
+  <div
+    className="absolute -top-32 -left-32 w-112.5 h-112.5 rounded-full pointer-events-none z-0 blur-3xl opacity-60 dark:opacity-40"
+    style={{
+      background:
+        "radial-gradient(circle, color-mix(in oklab, var(--color-primary) 40%, transparent) 0%, transparent 70%)",
+    }}
+  />
+  <div
+    className="absolute -bottom-32 -right-32 w-112.5 h-112.5 rounded-full pointer-events-none z-0 blur-3xl opacity-50 dark:opacity-30"
+    style={{
+      background:
+        "radial-gradient(circle, color-mix(in oklab, var(--color-brand, var(--color-primary)) 35%, transparent) 0%, transparent 70%)",
+    }}
+  />
 
-          <p className="max-w-2xl text-base md:text-lg text-zinc-600 dark:text-(--color-muted-foreground) font-medium dark:font-normal">
-            {ar
-              ? "نظرة على بعض المشاريع واللوحات المميزة التي قمنا بإنتاجها وتجهيزها لشركاء نجاحنا."
-              : "Selected projects across visual identity, fine printing, and outdoor signage."}
-          </p>
-        </div>
-      </section>
+  {/* 4. الصورة الديكورية الخلفية - مدمجة في المركز بانسجام */}
+      <div className="absolute top-1/5 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none w-full max-w-3xl flex justify-center items-center px-4">
+    <img
+      src={heroImage}
+      alt="Decorative Background"
+      className="w-full max-w-4xl h-auto max-h-[60vh] object-contain opacity-[0.18] dark:opacity-[0.12] scale-105 blur-[0.5px] transition-all duration-700"
+    />
+  </div>
 
+  {/* 5. المحتوى الترحيبي للنص والتنقل */}
+  <div className="container-x max-w-5xl px-6 mx-auto relative z-10 flex flex-col items-center text-center">
+    
+    {/* شريط المسار التنقلي Breadcrumb */}
+    <nav 
+      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-500/5 border border-zinc-500/10 backdrop-blur-md mb-6 text-xs font-semibold text-zinc-600 dark:text-zinc-400 tracking-wider shadow-2xs" 
+      dir={ar ? "rtl" : "ltr"}
+    >
+      <Link to={ROUTES.HOME} className="hover:text-(--color-brand) transition-colors">
+        {ar ? "الرئيسية" : "Home"}
+      </Link>
+      <span className="text-zinc-300 dark:text-zinc-600">/</span>
+      <span className="text-(--color-brand) font-bold">
+        {ar ? "معرض الأعمال" : "Our Portfolio"}
+      </span>
+    </nav>
+
+    {/* العنوان الرئيسي */}
+    <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-white tracking-tight mb-6 max-w-4xl leading-[1.15] drop-shadow-2xs">
+      {ar ? "أعمال مختارة صُنعت بشغف وإتقان" : "Crafting Iconic Brand Experiences"}
+    </h1>
+
+    {/* الوصف الفرعي */}
+    <p className="max-w-2xl text-base sm:text-lg text-zinc-600 dark:text-(--color-muted-foreground) font-normal leading-relaxed">
+      {ar
+        ? "نظرة على بعض المشاريع واللوحات المميزة التي قمنا بإنتاجها وتجهيزها بأعلى معايير الجودة لشركاء نجاحنا."
+        : "Selected projects across visual identity, fine printing, and outdoor signage crafted with detail."}
+    </p>
+
+  </div>
+</section>
       {/* ── شريط التصفية البصري الذكي المربوط بـ "إدارة التصنيفات" ── */}
       {categoriesList.length > 0 && (
         <section className="w-full border-b border-zinc-100 dark:border-zinc-900 py-8 bg-zinc-50/50 dark:bg-zinc-950/20">
@@ -470,7 +524,7 @@ export function PortfolioView() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPortfolioItems.map((item: any, i: number) => {
               const isWide = i === 0 || i === 5;
               const projectImage = item.image_url || mainImages[i % mainImages.length];
