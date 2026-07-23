@@ -18,7 +18,7 @@ import { useLanguageContext } from "../../app/providers/LanguageProvider";
 import { ROUTES } from "../../app/config/routes";
 import Logo from "../../assets/logos/favicon.ico";
 // ─────────────────────────────────────────────────────────────────────────────
-// Nav items
+// Drawer footer
 // ─────────────────────────────────────────────────────────────────────────────
 interface NavItem {
   labelKey: string;
@@ -651,6 +651,7 @@ export function Navbar() {
             position: "fixed",
             top: 0,
             bottom: 0,
+            // bottom: "calc(58px + env(safe-area-inset-bottom, 0px))",
             [isRtl ? "right" : "left"]: 0,
             width: "min(300px, 82vw)",
             zIndex: 999,
@@ -757,6 +758,7 @@ export function Navbar() {
           <div
             style={{
               padding: "1.1rem 1.25rem",
+              paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px))",
               borderTop: "1px solid var(--color-border)",
               display: "flex",
               flexDirection: "column",
