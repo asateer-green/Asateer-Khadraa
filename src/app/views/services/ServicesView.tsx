@@ -11,6 +11,7 @@ import serviceDesign from "../../../assets/images/service-design.jpg";
 import servicePrinting from "../../../assets/images/service-printing.jpg";
 import serviceManufacturing from "../../../assets/images/service-manufacturing.jpg";
 import serviceGifts from "../../../assets/images/service-gifts.jpg";
+import heroImage from "../../../assets/logos/logoweb.png"; // الصورة الديكورية الخلفية
 
 const icons = [Camera, Printer, Boxes, Gift];
 const images = [serviceDesign, servicePrinting, serviceManufacturing, serviceGifts];
@@ -25,7 +26,7 @@ export function ServicesView() {
     window.scrollTo(0, 0);
   }, []);
 
-  // ── مصفوفة احتياطية (Fallback) تضمن ظهور الكروت فوراً حتى لو حدثت مشكلة أو كانت قاعدة البيانات فارغة ──
+  // ── مصفوفة احتياطية (Fallback) ──
   const localFallbackItems = [
     {
       title: language === "ar" ? "التصميم والميديا" : "Design & Media",
@@ -61,15 +62,14 @@ export function ServicesView() {
         .map((s: any) => ({
           title: language === "ar" ? s.title_ar : s.title_en,
           desc: language === "ar" ? s.desc_ar : s.desc_en,
-          bullets: s.bullets || [], // مصفوفة النقاط الفرعية إن وجدت
+          bullets: s.bullets || [],
           image_url: s.image_url
         }))
     : [];
 
-  // 2. إذا كانت قاعدة البيانات تحتوي على خدمات معروضة نستخدمها، وإلا نعود للـ Fallback الافتراضي
+  // 2. اختيار مصدر البيانات
   const servicesItems = dynamicServices.length > 0 ? dynamicServices : localFallbackItems;
 
-  // في حالة جاري تحميل البيانات من قاعدة البيانات يفضل إظهار مؤشر تحميل بسيط
   if (isLoading) {
     return (
       <div className="w-full min-h-screen bg-(--color-background) flex items-center justify-center">
@@ -81,39 +81,84 @@ export function ServicesView() {
   }
 
   return (
-    <main className="w-full min-h-screen bg-(--color-background) animate-in fade-in duration-500 overflow-hidden">
+    <main className="relative w-full min-h-screen bg-(--color-background) animate-in fade-in duration-500 overflow-hidden">
 
-      {/* ── أولاً: البانر الترحيبي الهندسي الفاخر ── */}
-      <section className="relative w-full py-20 md:py-28 border-b border-zinc-200 dark:border-zinc-800 bg-linear-to-b from-zinc-50 to-white dark:from-green-950 dark:to-(--color-background)">
-        <div
-          className="absolute inset-0 pointer-events-none select-none opacity-[0.35] dark:opacity-[0.15] bg-[linear-gradient(to_right,rgba(0,229,147,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,229,147,0.12)_1px,transparent_1px)] bg-size-[32px_32px]"
-        />
+      {/* ── أولاً: طبقات الخلفية الموحدة لجميع الأجزاء ── */}
+      {/* 1. الجراديانت الرئيسي */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 20%, color-mix(in oklab, var(--color-primary) 20%, transparent) 0%, transparent 65%), linear-gradient(180deg, color-mix(in oklab, var(--color-background) 100%, transparent) 0%, color-mix(in oklab, var(--color-primary) 8%, var(--color-background)) 100%)",
+        }}
+      />
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-400/20 dark:bg-(--color-brand)/15 blur-[100px] rounded-full pointer-events-none select-none" />
+      {/* 2. شبكة Grid Pattern */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--color-foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--color-foreground) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          maskImage:
+            "radial-gradient(ellipse at center, black 40%, transparent 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at center, black 40%, transparent 85%)",
+        }}
+      />
+
+      {/* 3. إضاءات متوهجة Ambient Glows */}
+      <div
+        className="absolute -top-20 -left-20 w-md h-112 rounded-full pointer-events-none z-0 blur-3xl opacity-80"
+        style={{
+          background:
+            "radial-gradient(circle, color-mix(in oklab, var(--color-primary) 35%, transparent) 0%, transparent 70%)",
+        }}
+      />
+      <div
+        className="absolute top-1/3 -right-20 w-md h-112 rounded-full pointer-events-none z-0 blur-3xl opacity-70"
+        style={{
+          background:
+            "radial-gradient(circle, color-mix(in oklab, var(--color-brand, var(--color-primary)) 30%, transparent) 0%, transparent 70%)",
+        }}
+      />
+
+
+      {/* ── ثانياً: البانر الترحيبي ── */}
+      <section className="relative z-10 w-full py-20 md:py-28 border-b-2 border-(--color-border) bg-(--color-border)/10 dark:border-(--color-brand)/30 overflow-hidden">
+        
+        {/* الصورة الديكورية (العلامة المائية) تم وضعها داخل السكشن خلف النص تماماً */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none w-full max-w-2xl flex justify-center items-center px-4">
+          <img
+            src={heroImage}
+            alt="Decorative Background"
+            className="w-full h-auto max-h-[50vh] object-contain pointer-events-none opacity-[0.25] dark:opacity-[0.16] transition-opacity"
+          />
+        </div>
 
         <div className="container-x max-w-7xl px-6 mx-auto relative z-10 flex flex-col items-center text-center">
-          <nav className="flex items-center gap-2 mb-5 text-xs font-bold text-zinc-500 dark:text-zinc-900 uppercase tracking-wider" dir={language === "ar" ? "rtl" : "ltr"}>
+          <nav className="flex items-center gap-2 mb-5 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider" dir={language === "ar" ? "rtl" : "ltr"}>
             <Link to={ROUTES.HOME} className="hover:text-(--color-brand) transition-colors">
               {language === "ar" ? "الرئيسية" : "Home"}
             </Link>
-            <span className="text-zinc-300 dark:text-zinc-700">/</span>
+            <span className="text-zinc-400 dark:text-zinc-600">/</span>
             <span className="text-(--color-brand) font-extrabold">
               {language === "ar" ? "خدماتنا" : "Our Services"}
             </span>
           </nav>
 
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-white tracking-tight mb-5 max-w-3xl leading-tight">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-(--color-foreground) tracking-tight mb-5 max-w-3xl leading-tight">
             {language === "ar" ? "ما الذي يمكننا صنعه لعلامتك؟" : (t("services.title") || "Our Integrated Services")}
           </h1>
 
-          <p className="max-w-2xl text-base md:text-lg text-zinc-600 dark:text-(--color-muted-foreground) font-medium dark:font-normal">
+          <p className="max-w-2xl text-base md:text-lg text-(--color-muted-foreground) font-normal leading-relaxed">
             {t("services.subtitle") || (language === "ar" ? "خدمات إنتاج متكاملة للتصميم والطباعة والتصنيع والهدايا الدعائية" : "Integrated production services for ambitious brands.")}
           </p>
         </div>
       </section>
 
-      {/* ── ثانياً: كروت المقالات الديناميكية التناوبية الذكية ── */}
-      <section className="container-x max-w-7xl px-6 mx-auto py-24 space-y-8" dir={language === "ar" ? "rtl" : "ltr"}>
+      {/* ── ثالثاً: كروت المقالات الديناميكية التناوبية ── */}
+      <section className="relative z-10 container-x max-w-7xl px-6 mx-auto py-24 space-y-8" dir={language === "ar" ? "rtl" : "ltr"}>
         {servicesItems.map((item: any, i: number) => {
           const Icon = icons[i] || Boxes;
           const flip = i % 2 === 1;
@@ -121,7 +166,7 @@ export function ServicesView() {
           return (
             <article
               key={item.title || i}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) transition-smooth hover:border-emerald-500/20 dark:hover:border-emerald-500/10 hover:shadow-card"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface)/80 backdrop-blur-md transition-smooth hover:border-emerald-500/30 dark:hover:border-emerald-500/20 hover:shadow-card"
             >
               <div className={`relative min-h-70 lg:min-h-100 overflow-hidden ${flip ? "lg:order-2" : ""}`}>
                 <img
@@ -130,7 +175,6 @@ export function ServicesView() {
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 hover:scale-103"
                   onError={(e) => {
-                    // حماية احتياطية في حال تعطل رابط الصورة الخارجي القادم من قاعدة البيانات
                     (e.target as HTMLImageElement).src = images[i % images.length];
                   }}
                 />
@@ -168,20 +212,23 @@ export function ServicesView() {
         })}
       </section>
 
-      < LogoDesignsSection /> {/* استدعاء قسم الشعارات الديناميكي */}
+      {/* قسم الشعارات */}
+      <div className="relative z-10">
+        <LogoDesignsSection />
+      </div>
 
-      {/* ── ثالثاً: بانر الـ CTA السفلي الفاخر المشرق ── */}
-      <section className="container-x max-w-7xl px-6 mx-auto pb-24">
+      {/* ── رابعاً: بانر الـ CTA السفلي ── */}
+      <section className="relative z-10 container-x max-w-7xl px-6 mx-auto pb-24">
         <div
-          className="relative w-full rounded-3xl p-10 md:p-14 overflow-hidden bg-linear-to-br from-white via-emerald-50/20 to-zinc-50 dark:from-green-900 dark:via-emerald-950/40 dark:to-green-900 border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm dark:shadow-glow flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-start transition-all duration-300"
+          className="relative w-full rounded-3xl p-10 md:p-14 overflow-hidden bg-(--color-surface)/90 backdrop-blur-md border border-emerald-500/20 dark:border-emerald-500/10 shadow-sm dark:shadow-glow flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-start transition-all duration-300"
         >
           <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-emerald-500/10 dark:bg-(--color-brand)/20 blur-3xl rounded-full pointer-events-none select-none" />
 
           <div className="relative z-10 flex flex-col gap-3 items-center md:items-start">
-            <h2 className="text-2xl md:text-4xl font-black text-zinc-950 dark:text-white tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-black text-(--color-foreground) tracking-tight">
               {language === "ar" ? "لنصنع شيئاً أسطورياً معاً" : (t("contact.title") || "Let's Build Something Legendary")}
             </h2>
-            <p className="text-sm text-(--color-muted-foreground) max-w-xl font-medium dark:font-normal leading-relaxed">
+            <p className="text-sm text-(--color-muted-foreground) max-w-xl font-normal leading-relaxed">
               {language === "ar" ? "تواصل معنا اليوم لتحويل أفكارك المبدعة إلى منتجات وهوية بصرية مطبوعة بأعلى جودة." : (t("contact.description") || "Contact us today to turn your creative concepts into high-quality reality.")}
             </p>
           </div>
