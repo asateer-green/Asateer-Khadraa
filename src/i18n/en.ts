@@ -67,7 +67,7 @@ const en = {
     bottomCta: "View All Advertising Services & Solutions",
     items: {
       media: {
-        title: "Design & Media",
+        title: "Visual identity design",
         desc: "Comprehensive visual identity design, professional photography, video production, motion graphics, and creative content creation that elevates your brand positioning.",
         bullets: [
           "Visual Identity",
@@ -77,7 +77,7 @@ const en = {
         ],
       },
       printing: {
-        title: "Digital & Offset Printing",
+        title: "Luxury printing",
         desc: "Indoor and outdoor printing using world-class HP, Plamac, and OKI equipment, guaranteeing vivid colors and high precision across all materials.",
         bullets: [
           "Offset Printing",
@@ -97,7 +97,7 @@ const en = {
         ],
       },
       manufacturing: {
-        title: "Manufacturing & Production",
+        title: "Exterior panels and metal structures",
         desc: "Fabrication of all types of signage, cladding structures, custom display stands, and exhibition booths crafted with high engineering quality.",
         bullets: [
           "Cladding Signage",
@@ -137,7 +137,7 @@ const en = {
         ],
       },
       packaging: {
-        title: "Packaging & Cartons",
+        title: "Manufacturing & Assembly",
         desc: "Design and manufacturing of innovative, customized packaging and cartons for large corporations, designed to enhance your brand presence and leave a premium impression.",
         bullets: [
           "Product Packaging",

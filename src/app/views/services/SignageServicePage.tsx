@@ -63,7 +63,7 @@ export const SignageServicePage: React.FC = () => {
               <div className="w-10 h-10 rounded-xl bg-(--color-brand)/10 text-(--color-brand) flex items-center justify-center font-bold text-lg shrink-0">
                 ✓
               </div>
-              <span className="font-medium text-(--color-foreground)/90 min-w-0 flex-1 wrap-break-word">
+              <span className="font-medium text-sm sm:text-base text-(--color-foreground)/90 min-w-0 flex-1 wrap-break-word">
                 {bullet}
               </span>
             </div>
