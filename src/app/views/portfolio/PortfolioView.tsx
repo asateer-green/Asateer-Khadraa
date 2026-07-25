@@ -571,11 +571,11 @@ export function PortfolioView() {
       {/* ── ثالثاً: الـ Modal التفصيلي المطور للعمل المختار ── */}
       {selectedProject && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-zinc-950/85 backdrop-blur-md animate-in fade-in duration-300"
+          className="fixed inset-0 z-50 flex items-start md:items-center justify-center overflow-y-auto p-4 md:p-6 bg-zinc-950/85 backdrop-blur-md animate-in fade-in duration-300"
           onClick={() => setSelectedProject(null)}
         >
           <div
-            className="relative w-full max-w-5xl bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl border border-zinc-800 grid grid-cols-1 md:grid-cols-12 max-h-[90vh] md:max-h-[85vh]"
+            className="relative w-full max-w-5xl my-6 md:my-0 bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl border border-zinc-800 grid grid-cols-1 md:grid-cols-12 max-h-[85dvh] md:max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
             dir={ar ? "rtl" : "ltr"}
           >
@@ -583,7 +583,7 @@ export function PortfolioView() {
               type="button"
               onClick={() => setSelectedProject(null)}
               title={ar ? "إغلاق" : "Close"}
-              className={`absolute top-4 z-30 p-2 rounded-full bg-zinc-950/50 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer ${
+              className={`absolute top-8 z-30 p-2 rounded-full bg-zinc-950/50 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all cursor-pointer ${
                 ar ? "left-4" : "right-4"
               }`}
             >
@@ -592,7 +592,7 @@ export function PortfolioView() {
 
             {/* الجانب الأيمن أو الأيسر لصور المعرض والـ Thumbnails */}
             <div className="md:col-span-7 bg-zinc-950 flex flex-col justify-between relative p-4 group/slider">
-              <div className="relative w-full h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden rounded-2xl bg-zinc-900">
+              <div className="relative w-full h-[35dvh] md:h-[50vh] flex items-center justify-center overflow-hidden rounded-2xl bg-zinc-900">
                 <img
                   src={
                     (selectedProject.gallery && selectedProject.gallery[currentImgIndex]) ||
@@ -642,7 +642,7 @@ export function PortfolioView() {
             </div>
 
             {/* الجزء الجانبي للبيانات التفصيلية للمشروع */}
-            <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-between overflow-y-auto max-h-[40vh] md:max-h-full border-t md:border-t-0 md:border-s border-zinc-800 bg-zinc-900/60">
+            <div className="md:col-span-5 p-6 md:p-8 flex flex-col justify-between overflow-y-auto max-h-[45dvh] md:max-h-full border-t md:border-t-0 md:border-s border-zinc-800 bg-zinc-900/60">
               <div className="text-start">
                 <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-2">
                   {selectedProject.category}
