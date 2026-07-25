@@ -1,10 +1,4 @@
 // src/components/layout/Navbar.tsx
-//
-// FIX NOTES:
-// 1. كل الـ responsive مبني على JS state (isMobile) بدل Tailwind classes
-//    لأن style={{ display }} بيـ override className في React
-// 2. useLanguageContext و useThemeContext بالأسماء الصحيحة من الـ Providers
-// 3. t() fallback يظهر النص بدل الـ key لو الترجمة مفقودة
 
 import {
   useCallback,
@@ -17,23 +11,41 @@ import { useThemeContext } from "../../app/providers/ThemeProvider";
 import { useLanguageContext } from "../../app/providers/LanguageProvider";
 import { ROUTES } from "../../app/config/routes";
 import Logo from "../../assets/logos/favicon.ico";
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Drawer footer
+// Types & Nav Configuration
 // ─────────────────────────────────────────────────────────────────────────────
-interface NavItem {
+interface SubNavItem {
   labelKey: string;
   href: string;
 }
+
+interface NavItem {
+  labelKey: string;
+  href: string;
+  children?: SubNavItem[];
+}
+
 const NAV_ITEMS: NavItem[] = [
   { labelKey: "nav.home", href: ROUTES.HOME },
   { labelKey: "nav.about", href: ROUTES.ABOUT },
-  { labelKey: "nav.services", href: ROUTES.SERVICES },
+  {
+    labelKey: "nav.services",
+    href: ROUTES.SERVICES,
+    children: [
+      { labelKey: "services.items.printing.title", href: ROUTES.PRINTING_SERVICE },
+      { labelKey: "services.items.manufacturing.title", href: ROUTES.SIGNAGE_SERVICE },
+      { labelKey: "services.items.media.title", href: ROUTES.MEDIA_SERVICE },
+      { labelKey: "services.items.gifts.title", href: ROUTES.GIFTS_SERVICE },
+      { labelKey: "services.items.packaging.title", href: ROUTES.PACKAGING_SERVICE },
+      
+    ],
+  },
   { labelKey: "nav.portfolio", href: ROUTES.PORTFOLIO },
-  // { labelKey: "nav.contact", href: ROUTES.CONTACT },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Breakpoint hook  (replaces Tailwind responsive classes)
+// Breakpoint hook
 // ─────────────────────────────────────────────────────────────────────────────
 function useIsMobile(breakpoint = 768): boolean {
   const [isMobile, setIsMobile] = useState(
@@ -50,20 +62,10 @@ function useIsMobile(breakpoint = 768): boolean {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Inline icons (zero external deps)
+// Inline Icons
 // ─────────────────────────────────────────────────────────────────────────────
 const SunIcon = () => (
-  <svg
-    width="17"
-    height="17"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="12" cy="12" r="5" />
     <line x1="12" y1="1" x2="12" y2="3" />
     <line x1="12" y1="21" x2="12" y2="23" />
@@ -76,166 +78,74 @@ const SunIcon = () => (
   </svg>
 );
 const MoonIcon = () => (
-  <svg
-    width="17"
-    height="17"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
   </svg>
 );
 const CloseIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 );
 const GlobeIcon = () => (
-  <svg
-    width="15"
-    height="15"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="12" cy="12" r="10" />
     <line x1="2" y1="12" x2="22" y2="12" />
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z" />
   </svg>
 );
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Bottom tab-bar icons (LinkedIn-style: icon + label, mobile only)
-// ─────────────────────────────────────────────────────────────────────────────
-const HomeTabIcon = ({ active }: { active?: boolean }) => (
+const ChevronDownIcon = ({ open }: { open?: boolean }) => (
   <svg
-    width="22"
-    height="22"
+    width="12"
+    height="12"
     viewBox="0 0 24 24"
-    fill={active ? "currentColor" : "none"}
+    fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    style={{
+      transition: "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+      transform: open ? "rotate(180deg)" : "rotate(0deg)",
+    }}
     aria-hidden="true"
   >
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bottom Tab Bar Icons
+// ─────────────────────────────────────────────────────────────────────────────
+const HomeTabIcon = ({ active }: { active?: boolean }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M3 11.5 12 4l9 7.5" />
     <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
   </svg>
 );
 const ServicesTabIcon = ({ active }: { active?: boolean }) => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <rect
-      x="3"
-      y="7"
-      width="18"
-      height="13"
-      rx="2"
-      fill={active ? "currentColor" : "none"}
-      fillOpacity={active ? 0.15 : 0}
-    />
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="7" width="18" height="13" rx="2" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
     <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     <line x1="3" y1="12" x2="21" y2="12" />
   </svg>
 );
 const PortfolioTabIcon = ({ active }: { active?: boolean }) => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <rect
-      x="3"
-      y="4"
-      width="18"
-      height="16"
-      rx="2"
-      fill={active ? "currentColor" : "none"}
-      fillOpacity={active ? 0.15 : 0}
-    />
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="16" rx="2" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
     <circle cx="8.5" cy="9.5" r="1.5" />
     <path d="m21 15-5-5-9 9" />
   </svg>
 );
-const ContactTabIcon = ({ active }: { active?: boolean }) => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <rect
-      x="2"
-      y="5"
-      width="20"
-      height="14"
-      rx="2"
-      fill={active ? "currentColor" : "none"}
-      fillOpacity={active ? 0.15 : 0}
-    />
-    <path d="m3 7 9 6 9-6" />
-  </svg>
-);
 const MoreTabIcon = ({ active }: { active?: boolean }) => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="4.5" cy="12" r="1.6" fill={active ? "currentColor" : "none"} />
     <circle cx="12" cy="12" r="1.6" fill={active ? "currentColor" : "none"} />
     <circle cx="19.5" cy="12" r="1.6" fill={active ? "currentColor" : "none"} />
   </svg>
 );
 
-// خريطة الأيقونات لكل رابط — بترجع الأيقونة المناسبة حسب href
 function getBottomTabIcon(href: string, active: boolean) {
   switch (href) {
     case ROUTES.HOME:
@@ -244,15 +154,13 @@ function getBottomTabIcon(href: string, active: boolean) {
       return <ServicesTabIcon active={active} />;
     case ROUTES.PORTFOLIO:
       return <PortfolioTabIcon active={active} />;
-    case ROUTES.CONTACT:
-      return <ContactTabIcon active={active} />;
     default:
       return <HomeTabIcon active={active} />;
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Navbar
+// Navbar Component
 // ─────────────────────────────────────────────────────────────────────────────
 export function Navbar() {
   const { resolvedTheme, toggleTheme } = useThemeContext();
@@ -263,15 +171,18 @@ export function Navbar() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   const drawerRef = useRef<HTMLDivElement>(null);
   const moreTabRef = useRef<HTMLButtonElement>(null);
   const isRtl = direction === "rtl";
 
-  // ── close drawer on route change ──
+  // ── close drawer & dropdowns on route change ──
   useEffect(() => {
     setDrawerOpen(false);
-  }, [location.pathname]);
+    setActiveDropdown(null);
+  }, [location.pathname, location.hash]);
 
   // ── close drawer when switching to desktop ──
   useEffect(() => {
@@ -330,7 +241,7 @@ export function Navbar() {
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
-  // ── Secret admin access: 5 taps on logo ──────────────────────────────
+  // ── Secret admin access ──
   const navigate = useNavigate();
   const tapCountRef = useRef(0);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -345,8 +256,7 @@ export function Navbar() {
     tapTimerRef.current = setTimeout(() => { tapCountRef.current = 0; }, 2000);
   }, [navigate]);
 
-  // ── styles ──────────────────────────────────────────────────────────────
-
+  // ── styles ──
   const iconBtn: React.CSSProperties = {
     display: "flex",
     alignItems: "center",
@@ -384,7 +294,7 @@ export function Navbar() {
 
   return (
     <>
-      {/* ── Inject underline animation once ───────────────────────────── */}
+      {/* ── Inject styles ────────────────────────────────────────────── */}
       <style>{`
         .nav-link-item::after {
           content: "";
@@ -411,13 +321,14 @@ export function Navbar() {
           color: var(--color-brand-500) !important;
           background: color-mix(in srgb, var(--color-brand-500) 8%, transparent) !important;
         }
+        .dropdown-menu-item:hover {
+          background: var(--color-bg-secondary);
+          color: var(--color-brand-500) !important;
+        }
         .bottom-tab-link:active {
           opacity: 0.6;
         }
 
-        /* بنسيب مساحة تحت محتوى الصفحة عشان مايتغطاش بالـ bottom tab bar
-           (بنستهدف الـ body مباشرة عشان الـ Navbar ممكن يترندر فوق الـ Outlet
-           وأي spacer محلي هنا مش هيوصل لآخر الصفحة فعلياً) */
         @media (max-width: 767px) {
           body {
             padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
@@ -437,13 +348,9 @@ export function Navbar() {
           display: "flex",
           alignItems: "center",
           transition: "background 0.3s, box-shadow 0.3s, border-color 0.3s",
-
-          /* 👇 التعديل هنا: نخليه يقرأ درجة الـ bg-primary الجديدة مضاف لها شفافية بسيطة ولطيفة للـ Glassmorphism دايماً */
           background: "var(--color-bg-glow)",
           backdropFilter: "blur(18px) saturate(1.6)",
           WebkitBackdropFilter: "blur(18px) saturate(1.6)",
-
-          /* الحدود والظلال تتأثر بالـ Scroll بس عشان تفصل الناف بار لما نتحرك */
           borderBottom: `1px solid ${isScrolled ? "var(--color-border)" : "transparent"}`,
           boxShadow: isScrolled ? "0 4px 30px -8px rgba(0,0,0,0.08)" : "none",
         }}
@@ -468,28 +375,22 @@ export function Navbar() {
             aria-label="أساطير خضراء – الرئيسية"
             className="flex items-center gap-3 no-underline shrink-0 group"
           >
-            {/* 1. صورة اللوجو بأبعاد متناسقة وتأثير hover ناعم */}
             <img
               src={Logo}
               alt="Logo"
               className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-105"
             />
-
-            {/* 2. حاوية النصوص الجانبية (مرصوصة عمودياً) */}
             <div className="flex flex-col leading-[1.2] text-right">
-              {/* اسم المؤسسة الرئيسي بالـ Gradient المضيء */}
               <span className="font-display font-bold text-[1.15rem] bg-linear-to-r from-(--color-brand) to-(--color-accent) bg-clip-text text-transparent">
                 {language === "ar" ? "أساطير خضراء" : "Asateer Green"}
               </span>
-
-              {/* الوصف الفرعي السفلي */}
               <span className="text-[0.58rem] font-medium tracking-[0.12em] uppercase text-(--color-muted-foreground)">
                 Print &amp; Advertising
               </span>
             </div>
           </Link>
 
-          {/* Desktop links — only rendered on desktop */}
+          {/* Desktop links */}
           {!isMobile && (
             <ul
               role="list"
@@ -502,22 +403,115 @@ export function Navbar() {
                 padding: 0,
               }}
             >
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  <NavLink
-                    to={item.href}
-                    end={item.href === ROUTES.HOME}
-                    className={({ isActive }) =>
-                      `nav-link-item${isActive ? " active-link" : ""}`
-                    }
-                    style={({ isActive }) =>
-                      isActive ? activeLink : inactiveLink
-                    }
+              {NAV_ITEMS.map((item) => {
+                const hasChildren = item.children && item.children.length > 0;
+                const isDropdownOpen = activeDropdown === item.href;
+
+                return (
+                  <li
+                    key={item.href}
+                    style={{ position: "relative" }}
+                    onMouseEnter={() => hasChildren && setActiveDropdown(item.href)}
+                    onMouseLeave={() => hasChildren && setActiveDropdown(null)}
                   >
-                    {t(item.labelKey)}
-                  </NavLink>
-                </li>
-              ))}
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      <NavLink
+                        to={item.href}
+                        end={item.href === ROUTES.HOME}
+                        className={({ isActive }) =>
+                          `nav-link-item${isActive ? " active-link" : ""}`
+                        }
+                        style={({ isActive }) =>
+                          isActive ? activeLink : inactiveLink
+                        }
+                      >
+                        {t(item.labelKey)}
+                      </NavLink>
+
+                      {hasChildren && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setActiveDropdown((prev) =>
+                              prev === item.href ? null : item.href
+                            )
+                          }
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            padding: "4px",
+                            cursor: "pointer",
+                            color: "var(--color-text-secondary)",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                          aria-expanded={isDropdownOpen}
+                          aria-label="فتح قائمة الأقسام"
+                        >
+                          <ChevronDownIcon open={isDropdownOpen} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Desktop Dropdown Menu */}
+                    {hasChildren && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "100%",
+                          [isRtl ? "right" : "left"]: "-12px",
+                          paddingTop: "8px",
+                          opacity: isDropdownOpen ? 1 : 0,
+                          visibility: isDropdownOpen ? "visible" : "hidden",
+                          transform: isDropdownOpen
+                            ? "translateY(0)"
+                            : "translateY(8px)",
+                          transition:
+                            "opacity 0.2s, transform 0.2s, visibility 0.2s",
+                          zIndex: 1010,
+                        }}
+                      >
+                        <ul
+                          style={{
+                            minWidth: "190px",
+                            background: "var(--color-bg-card)",
+                            border: "1px solid var(--color-border)",
+                            borderRadius: "var(--radius-md, 10px)",
+                            boxShadow: "0 10px 30px -5px rgba(0,0,0,0.15)",
+                            padding: "6px",
+                            listStyle: "none",
+                            margin: 0,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "2px",
+                          }}
+                        >
+                          {item.children?.map((subItem) => (
+                            <li key={subItem.href}>
+                              <Link
+                                to={subItem.href}
+                                className="dropdown-menu-item"
+                                style={{
+                                  display: "block",
+                                  padding: "8px 12px",
+                                  fontSize: "0.825rem",
+                                  fontWeight: 500,
+                                  color: "var(--color-text-secondary)",
+                                  textDecoration: "none",
+                                  borderRadius: "6px",
+                                  transition: "background 0.15s, color 0.15s",
+                                }}
+                              >
+                                {t(subItem.labelKey)}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
 
@@ -616,7 +610,6 @@ export function Navbar() {
                 {t("nav.quoteRequest")}
               </Link>
             )}
-
           </div>
         </nav>
       </header>
@@ -651,7 +644,6 @@ export function Navbar() {
             position: "fixed",
             top: 0,
             bottom: 0,
-            // bottom: "calc(58px + env(safe-area-inset-bottom, 0px))",
             [isRtl ? "right" : "left"]: 0,
             width: "min(300px, 82vw)",
             zIndex: 999,
@@ -682,20 +674,6 @@ export function Navbar() {
               boxSizing: "border-box",
             }}
           >
-            {/* <span
-              style={{
-                fontFamily: "var(--font-display, sans-serif)",
-                fontWeight: 700,
-                fontSize: "1rem",
-                background:
-                  "linear-gradient(135deg, var(--color-brand-500), var(--color-teal-400))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              {language === "ar" ? "أساطير خضراء" : "Asateer Green"}
-            </span> */}
             <button
               type="button"
               onClick={closeDrawer}
@@ -723,34 +701,95 @@ export function Navbar() {
               role="list"
               style={{ listStyle: "none", margin: 0, padding: 0 }}
             >
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  <NavLink
-                    to={item.href}
-                    end={item.href === ROUTES.HOME}
-                    onClick={closeDrawer}
-                    className="drawer-link"
-                    style={({ isActive }) => ({
-                      display: "block",
-                      paddingInline: "1.25rem",
-                      paddingBlock: "0.85rem",
-                      fontSize: "0.925rem",
-                      fontWeight: isActive ? 600 : 400,
-                      textDecoration: "none",
-                      color: isActive
-                        ? "var(--color-brand-500)"
-                        : "var(--color-text-secondary)",
-                      background: isActive
-                        ? "color-mix(in srgb, var(--color-brand-500) 8%, transparent)"
-                        : "transparent",
-                      borderInlineStart: `3px solid ${isActive ? "var(--color-brand-500)" : "transparent"}`,
-                      transition: "all 0.18s",
-                    })}
-                  >
-                    {t(item.labelKey)}
-                  </NavLink>
-                </li>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                const hasChildren = item.children && item.children.length > 0;
+
+                return (
+                  <li key={item.href}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <NavLink
+                        to={item.href}
+                        end={item.href === ROUTES.HOME}
+                        onClick={closeDrawer}
+                        className="drawer-link"
+                        style={({ isActive }) => ({
+                          flex: 1,
+                          display: "block",
+                          paddingInline: "1.25rem",
+                          paddingBlock: "0.85rem",
+                          fontSize: "0.925rem",
+                          fontWeight: isActive ? 600 : 400,
+                          textDecoration: "none",
+                          color: isActive
+                            ? "var(--color-brand-500)"
+                            : "var(--color-text-secondary)",
+                          background: isActive
+                            ? "color-mix(in srgb, var(--color-brand-500) 8%, transparent)"
+                            : "transparent",
+                          borderInlineStart: `3px solid ${isActive ? "var(--color-brand-500)" : "transparent"}`,
+                          transition: "all 0.18s",
+                        })}
+                      >
+                        {t(item.labelKey)}
+                      </NavLink>
+
+                      {hasChildren && (
+                        <button
+                          type="button"
+                          onClick={() => setMobileServicesOpen((prev) => !prev)}
+                          style={{
+                            padding: "0.85rem 1.25rem",
+                            background: "transparent",
+                            border: "none",
+                            color: "var(--color-text-secondary)",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <ChevronDownIcon open={mobileServicesOpen} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Sub-items in Mobile Drawer */}
+                    {hasChildren && mobileServicesOpen && (
+                      <ul
+                        style={{
+                          listStyle: "none",
+                          margin: 0,
+                          padding: 0,
+                          background: "var(--color-bg-secondary)",
+                          paddingInlineStart: "1rem",
+                        }}
+                      >
+                        {item.children?.map((subItem) => (
+                          <li key={subItem.href}>
+                            <Link
+                              to={subItem.href}
+                              onClick={closeDrawer}
+                              style={{
+                                display: "block",
+                                paddingInline: "1.25rem",
+                                paddingBlock: "0.65rem",
+                                fontSize: "0.85rem",
+                                color: "var(--color-text-secondary)",
+                                textDecoration: "none",
+                              }}
+                            >
+                              {t(subItem.labelKey)}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -817,7 +856,6 @@ export function Navbar() {
                     cursor: "pointer",
                   }}
                 >
-                  {/* الـ span دي هي اللي هتاخد تأثير الدوران للأيقونة فقط */}
                   <span
                     style={{
                       display: "inline-flex",
@@ -837,7 +875,7 @@ export function Navbar() {
         </div>
       )}
 
-      {/* ── Bottom tab bar (mobile only) — أيقونة فوق واسمها تحت، زي LinkedIn ── */}
+      {/* ── Bottom tab bar (mobile only) ─────────────────────────────────── */}
       {isMobile && (
         <nav
           aria-label="القائمة السفلية"
@@ -898,7 +936,7 @@ export function Navbar() {
             );
           })}
 
-          {/* More — بيفتح نفس الدرج (الثيم / اللغة / اطلب عرض سعر) */}
+          {/* More tab */}
           <button
             ref={moreTabRef}
             type="button"

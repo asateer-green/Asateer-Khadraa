@@ -3,9 +3,9 @@
 //    الـ explicit cast يمنع TypeScript من تتبع الـ nested structure.
 
 const en = {
-  common: {
+ common: {
     loading: "Loading...",
-    error: "Something went wrong",
+    error: "An error occurred",
     retry: "Retry",
     save: "Save",
     cancel: "Cancel",
@@ -27,115 +27,177 @@ const en = {
     about: "About Us",
     services: "Services",
     portfolio: "Portfolio",
-    contact: "Contact",
-    quoteRequest: "Get a quote",
+    contact: "Contact Us",
+    quoteRequest: "Request Quote",
     dashboard: "Dashboard",
     login: "Login",
     logout: "Logout",
   },
+  home: {
+    heroTitle: "Asateer Khadraa",
+    heroSubtitle: "Advertising & Marketing",
+    heroDescription:
+      "Integrated solutions in visual identity and advertising services. Combining creativity and professionalism to deliver a unique experience.",
+    ctaPrimary: "Explore Services",
+    ctaSecondary: "Contact Us",
+  },
   hero: {
-    titleNormal: "Asateer Green",
-    titleGradient: "Print & Advertising",
+    titleNormal: "Asateer Khadraa",
+    titleGradient: " Combining Creativity and Professionalism",
     description:
-      "An integrated creative studio delivering visual identity, premium print, manufacturing and outdoor advertising across Saudi Arabia.",
-    viewPortfolio: "View Our Portfolio",
+      " A creative agency specialized in visual identity, luxury printing, sign manufacturing, and outdoor signage across the Kingdom of Saudi Arabia. ",
+    viewPortfolio: " View Our Work ",
   },
   about: {
-    badge: "Why Choose Us?",
-    title: "Transforming Brands into an Integrated Visual Presence",
+    badge: " About Our Agency ",
+    title: "Transforming Brands into Complete Visual Presence",
     description:
-      "Asateer Green is a creative agency specializing in advertising, media, and print production. We deliver comprehensive identity solutions and advertising services, merging creative concepts with corporate-grade manufacturing to craft premium end-to-end user experiences—from initial logo design to high-impact outdoor billboards.",
-    description2: "Print & advertising, engineered for ambitious brands.",
+      "Asateer Khadraa is a creative agency specializing in advertising, printing, and brand production. We combine creative thinking with industrial execution to provide a seamless experience for our clients, from logo design to large-scale outdoor signage.",
+    description2: "Printing & Advertising, engineering ambitious brands.",
     cta: "Our Services",
+    story_title: "Combining Creativity and Professionalism",
+    story_p1:
+      "Asateer Khadraa is a specialized creative agency in advertising and marketing, delivering end-to-end visual identity and branding solutions. We bring together creativity and technical mastery to exceed client expectations with high-quality standards.",
   },
+
   services: {
-  title: "Our Integrated Services",
-  subtitle: "Integrated production services across visual identity, printing, fabrication, and premium corporate gifts.",
-  bottomCta: "Explore All Services",
-  items: {
-    media: {
-      title: "Design & Media",
-      desc: "Integrated visual identity design, professional photography, video and motion graphics production, and premium creative content.",
-      bullets: ["Visual Identity", "Photography", "Motion Graphics", "Video Production"],
-    },
-    printing: {
-      title: "Digital Printing",
-      desc: "Indoor and outdoor printing using HP, Plamac, and OKI equipment with superior color accuracy on all materials.",
-      bullets: ["Offset Printing", "Signage", "Digital Printing", "Packaging & Boxes"],
-    },
-    gifts: {
-      title: "Promotional Gifts",
-      desc: "Innovative and customized promotional gifts for companies and institutions to enhance brand presence.",
-      bullets: ["Corporate VIP Gifts", "Custom Pens & Notebooks", "Event Merch", "Trophies & Awards"],
-    },
-    manufacturing: {
-      title: "Manufacturing & Production",
-      desc: "Custom fabrication of all signage types, cladding structures, display stands, and exhibition booths.",
-      bullets: ["Cladding Signage", "3D Luminous Letters", "Display Stands", "Exhibition Booths"],
-    },
-    advertising: {
-      title: "Integrated Advertising Solutions",
-      desc: "Comprehensive advertising solutions including strategic planning, campaign management, digital marketing, and outdoor advertising.",
-      bullets: ["Strategic Planning", "Campaign Management", "Digital Marketing", "Outdoor Advertising"],
-    },
-    branding: {
-      title: "Branding & Visual Identity",
-      desc: "Brand development through logo design, color selection, visual identity guidelines, and marketing materials.",
-      bullets: ["Logo Design", "Color Palette", "Brand Guidelines", "Marketing Materials"],
-    },
-    events: {
-      title: "Events & Exhibitions",
-      desc: "Full event and exhibition setup from graphic design to booth fabrication and signage production.",
-      bullets: ["Event Graphics", "Booth Fabrication", "Event Signage", "Exhibition Setup"],
-    },
-    other: {
-      title: "Other Services",
-      desc: "Additional services including marketing consultancy, packaging design, social media management, and specialized printing.",
-      bullets: ["Marketing Consultancy", "Packaging Design", "Social Media Management", "Specialized Printing"],
+    title: "What Can We Build For Your Brand?",
+    subtitle:
+      "Integrated production services for design, printing, manufacturing, and luxury promotional gifts",
+    bottomCta: "View All Advertising Services & Solutions",
+    items: {
+      media: {
+        title: "Design & Media",
+        desc: "Comprehensive visual identity design, professional photography, video production, motion graphics, and creative content creation that elevates your brand positioning.",
+        bullets: [
+          "Visual Identity",
+          "Professional Photography",
+          "Motion Graphics",
+          "Video Production",
+        ],
+      },
+      printing: {
+        title: "Digital & Offset Printing",
+        desc: "Indoor and outdoor printing using world-class HP, Plamac, and OKI equipment, guaranteeing vivid colors and high precision across all materials.",
+        bullets: [
+          "Offset Printing",
+          "Signage Printing",
+          "Digital Printing",
+          "Packaging & Boxes",
+        ],
+      },
+      gifts: {
+        title: "Promotional Gifts",
+        desc: "Sourcing and manufacturing innovative, customized corporate gifts designed to strengthen brand presence and leave a lasting premium impression.",
+        bullets: [
+          "VIP Corporate Gifts",
+          "Custom Pens & Notebooks",
+          "Event Printables",
+          "Luxury Trophy Awards",
+        ],
+      },
+      manufacturing: {
+        title: "Manufacturing & Production",
+        desc: "Fabrication of all types of signage, cladding structures, custom display stands, and exhibition booths crafted with high engineering quality.",
+        bullets: [
+          "Cladding Signage",
+          "Illuminated 3D Letters",
+          "Display Stands",
+          "Exhibition Booth Setup",
+        ],
+      },
+      advertising: {
+        title: "Integrated Advertising Solutions",
+        desc: "End-to-end marketing solutions including strategic planning, campaign management, digital marketing, and outdoor ads to reach your target audience efficiently.",
+        bullets: [
+          "Strategic Planning",
+          "Campaign Management",
+          "Digital Marketing",
+          "Outdoor Advertising",
+        ],
+      },
+      branding: {
+        title: "Branding & Visual Identity",
+        desc: "Brand development through logo creation, color theory, brand guidelines, and collateral design that reflect your brand core and make it stand out.",
+        bullets: [
+          "Logo Design",
+          "Color Palette Design",
+          "Brand Guidelines Manual",
+          "Marketing Collaterals",
+        ],
+      },
+      events: {
+        title: "Event & Exhibition Setup",
+        desc: "Full event production with modern graphic design, booth fabrication, and signage to ensure a commanding presence at every corporate event.",
+        bullets: [
+          "Event Graphic Design",
+          "Booth Fabrication",
+          "Event Signage Design",
+          "Exhibition & Conference Setup",
+        ],
+      },
+      packaging: {
+        title: "Packaging & Cartons",
+        desc: "Design and manufacturing of innovative, customized packaging and cartons for large corporations, designed to enhance your brand presence and leave a premium impression.",
+        bullets: [
+          "Product Packaging",
+          "Custom Boxes",
+          "Packaging Design",
+          "Packaging Manufacturing",
+        ],
+      },
+      other: {
+        title: "Additional Services",
+        desc: "Extra services tailored for your brand growth, including marketing consultancy, packaging design, social media management, and specialized printing.",
+        bullets: [
+          "Marketing Consultancy",
+          "Packaging Design",
+          "Social Media Management",
+          "Specialized Printing Services",
+        ],
+      },
     },
   },
-},
+
   features: {
-    badge: "Why Choose Us",
-    mainTitle: "What Makes Us Different",
+    badge: "Our Standards",
+    mainTitle: "Quality in Every Detail",
     subtitle:
-      "A blend of creativity, precision, and customer-centricity that sets us apart in the industry.",
+      "From precise color calibration to weather-resistant materials, we engineer our work to endure.",
     items: {
       equipment: {
-        title: "Industrial equipment",
-        desc: "“HP, Plamac and OKI printers are calibrated to deliver identity-conforming colors no matter the size.",
+        title: "Industrial Grade Equipment",
+        desc: "Calibrated HP, Plamac, and OKI printers delivering exact brand colors regardless of scale.",
       },
       durability: {
-        title: "Designed to withstand outdoor conditions.",
-        desc: "Weather-resistant materials, multi-layer coatings, and long-lifespan LED lighting systems.",
+        title: "Built to Withstand Outdoors",
+        desc: "Weatherproof materials, multi-coat finishes, and long-lifespan LED lighting systems.",
       },
       responsibility: {
-        title: "Integrated responsibility",
+        title: "End-to-End Ownership",
         desc: "From concept to production, installation, and after-sales service. One team, one standard.",
       },
     },
     cta: {
-      title: "Ready to elevate your brand?",
-      desc: "Contact us today to discuss your project and discover how we can bring your vision to life.",
-      button: "Get in Touch",
+      title: "Let's Build Something Remarkable",
+      desc: "Tell us about your brand vision, and we will respond within one business day.",
+      button: "Contact Us",
     },
   },
   portfolio: {
     title: "Our Work",
-    subtitle: "Samples of our creative projects",
-    viewAll: "View All Work",
+    subtitle: "Showcase of Our Creative Projects",
+    viewAll: "View All Projects",
   },
   contact: {
     title: "Contact Us",
-    description:
-      "Tell us about your brand — we'll come back within one business day.",
+    description: " Tell us about your brand, and we will get back to you within 24 hours. ",
     name: "Name",
-    email: "Email",
-    phone: "Phone",
+    email: "Email Address",
+    phone: "Phone Number",
     message: "Message",
     send: "Send Message",
-    successMessage:
-      "Your message was sent successfully. We'll get back to you soon.",
+    successMessage: "Your message was sent successfully. We will contact you soon.",
     address: "Kingdom of Saudi Arabia",
     emailAddress: "Asateer.gr@gmail.com",
     phoneNumber: "+966570105601",
@@ -145,11 +207,10 @@ const en = {
     serviceType: "Service Type",
     description: "Project Description",
     budget: "Estimated Budget",
-    deadline: "Required Deadline",
+    deadline: "Desired Deadline",
     submit: "Submit Request",
-    success_title: "Your request has been received!",
-    successMessage:
-      "Your request has been received. We'll contact you within 24 hours.",
+    success_title: "Request Sent Successfully!",
+    successMessage: "We have received your request. We will contact you within 24 hours.",
   },
   dashboard: {
     title: "Dashboard",
@@ -159,16 +220,16 @@ const en = {
     logos: "Manage Logos",
     portfolio: "Manage Portfolio",
     categories: "Manage Categories",
-    quotes: "Manage Quotes",
+    quotes: "Manage Requests",
     settings: "Settings",
-    totalQuotes: "Total Quotes",
-    pendingQuotes: "Pending Quotes",
+    totalQuotes: "Total Requests",
+    pendingQuotes: "Pending Requests",
     totalServices: "Total Services",
-    totalPortfolio: "Total Portfolio",
+    totalPortfolio: "Total Portfolio Items",
   },
   auth: {
     login: "Login",
-    email: "Email",
+    email: "Email Address",
     password: "Password",
     loginButton: "Sign In",
     invalidCredentials: "Invalid credentials",
@@ -183,15 +244,15 @@ const en = {
   language: {
     arabic: "العربية",
     english: "English",
-    switch: "تغيير اللغة",
+    switch: "Switch Language",
   },
   errors: {
     notFound: "Page Not Found",
-    notFoundDescription: "Sorry, the page you're looking for doesn't exist.",
+    notFoundDescription: "Sorry, the page you are looking for does not exist.",
     serverError: "Server Error",
-    unauthorized: "Unauthorized",
-    goHome: "Go Home",
+    unauthorized: "Unauthorized Access",
+    goHome: "Back to Home",
   },
-} as const;
+};
 
 export default en;

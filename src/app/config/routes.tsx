@@ -4,10 +4,16 @@ export const ROUTES = {
   LOGIN: "/login",
   ABOUT: "/about",
   SERVICES: "/services",
+  PRINTING_SERVICE: "/services/printing",
+  ADVERTISING_SERVICE: "/services/advertising",
+  BRANDING_SERVICE: "/services/branding",
+  PACKAGING_SERVICE: "/services/packaging",
+  SIGNAGE_SERVICE: "/services/signage",
+  MEDIA_SERVICE: "/services/media",
+  GIFTS_SERVICE: "/services/gifts",
   PORTFOLIO: "/portfolio",
   CONTACT: "/contact",
   QUOTE_REQUEST: "/quote-request",
-  QUOTA_REQUEST: "/quota-request",
 
   // Dashboard
   DASHBOARD: "/dashboard",
